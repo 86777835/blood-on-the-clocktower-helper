@@ -1,6 +1,7 @@
 import { setupCheck, threshold, onBlock, nightList, phaseName, teamOf, isGood, BELIEVE, stepLabel, edChars,
   MIN_PLAYERS, MAX_PLAYERS, EDITIONS, CHARS, STEPS, TEAM_ZH } from './logic.js';
 import { esc, badge, cname, charList, nightOrder, TEAMS } from './views.js';
+import { autoInfo, pickInfo, PICKS, warnings, standing } from './info.js';
 
 const $ = s => document.querySelector(s);
 const store = {
@@ -15,7 +16,7 @@ const viewOnly = qs.get('v') === '1';   // the Storyteller's own phone showing t
 { const k = new URLSearchParams(location.hash.slice(1)).get('k'); if (code && /^[0-9a-f]{32}$/.test(k || '')) { remember(code, k); history.replaceState(null, '', location.pathname + location.search); } }
 
 let S = null, role = null, noRoom = false, online = false, ws = null, queue = [], retry = 0, notes = null;
-const ui = { tab: 'game', ptab: 'town', sheet: null, err: '', busy: false, saving: false, nom: null, rv: null, past: false };
+const ui = { tab: 'game', ptab: 'town', sheet: null, err: '', busy: false, saving: false, nom: null, rv: null, past: false, pick: {}, jug: {} };   // pick/jug: targets tapped in a night calculator
 
 function cleanCode(v) { const c = String(v || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 4); return c.length === 4 ? c : null; }
 // Rooms where this phone is the Storyteller: [{ code, key, t }], newest first.
@@ -195,6 +196,7 @@ function nightView() {
     : k === 'demoninfo' ? `<span class="ns-x">爪牙：${evil('minion')}；伪装：${S.bluffs.length ? S.bluffs.map(id => esc(CHARS[id].zh)).join('、') : '<button class="lnk" data-act="bluffs">还没选，点这里选</button>'}</span>` : '';
   return `${statusStrip(S)}
     <p class="note">${S.ph.n === 1 ? '首夜' : '今晚'}要叫醒的角色，按官方夜晚顺序。叫完一个就点左边的圈；给了什么信息记在下面那一行，终局复盘会用到。${S.n < 7 && S.ph.n === 1 ? '<b>5–6 人局：首夜没有爪牙信息和恶魔信息。</b>' : ''}</p>
+    ${standing(S).length ? `<div class="card ns-stand">${standing(S).map(t => `<p>${esc(t)}</p>`).join('')}</div>` : ''}
     <div class="card nlist">${list.map((x, n) => {
       const on = !!S.done[x.k], st = x.seat != null ? S.seats[x.seat] : null;
       return `<div class="ns${on ? ' done' : ''}${x.dead ? ' dead' : ''}" data-k="ns-${x.k}">
@@ -203,7 +205,7 @@ function nightView() {
           ${x.fake ? `<em class="fake">这位是${esc(CHARS[st.role].zh)}：以为自己是${esc(x.zh)}，照样叫醒，但能力无效</em>` : ''}
           ${x.dead ? '<em>已死亡：一般不叫醒，除非能力在死亡当晚生效</em>' : ''}
           ${st?.marks.length ? `<span class="mk">${st.marks.map(m => `<i>${esc(m.t)}</i>`).join('')}</span>` : ''}
-          <span class="ns-t">${esc(x.tip || '')}</span>${extra(x.k)}
+          <span class="ns-t">${esc(x.tip || '')}</span>${extra(x.k)}${infoBlock(x)}
           ${x.k === 'dusk' || x.k === 'dawn' ? '' : `<input class="pn ns-in" data-log="${x.k}" maxlength="120" placeholder="记一下：比如 给了数字 1、指了 3号 5号" value="${esc(logOf(x.k))}">`}</div></div>`;
     }).join('') || '<div class="empty">今晚没有要叫醒的角色</div>'}</div>
     <div class="btns more"><button class="btn ghost" data-act="tab" data-tab="grim">标记死亡 / 提醒标记</button><button class="btn ghost" data-act="note">记一笔</button></div>
@@ -234,12 +236,47 @@ function nomList(st, noms) {
 }
 
 function grimTab() {
-  return `<p class="note secret">点座位改死活、幽灵票、提醒标记或角色。夜里标记的死亡要等天亮后玩家手机上才会显示。</p>
-    <div class="list">${S.seats.map((x, i) => `<button class="card grim${x.dead ? ' dead' : ''}" data-act="seat" data-i="${i}" data-k="g-${i}"><span class="sno">${i + 1}</span>${badge(x.role)}
-      <span class="gm"><b>${esc(x.name)}<small>${cname(x.role)}${x.bel ? ` · 以为是${esc(CHARS[x.bel].zh)}` : ''}</small></b>
-      ${x.marks.length ? `<span class="mk">${x.marks.map(m => `<i>${esc(CHARS[m.c].zh)}·${esc(m.t)}</i>`).join('')}</span>` : ''}</span>
-      <span class="gs-st">${x.dead ? `<i class="sh">亡</i>${x.ghost ? '<i class="gv">票</i>' : '<i class="gv used">票</i>'}` : ''}</span></button>`).join('')}</div>
+  const marked = S.seats.map((x, i) => [x, i]).filter(([x]) => x.marks.length);
+  return `<p class="note secret">按座位围成一圈（1号在正上方，顺时针）。点座位改死活、幽灵票、提醒标记或角色。夜里标记的死亡要等天亮后玩家手机上才会显示。</p>
+    ${ring(S, true)}
+    ${marked.length ? `<h2 class="h"><span>提醒标记</span></h2><div class="card route"><ul class="dots">${marked.map(([x, i]) => `<li>${who(S, i)}：${x.marks.map(m => `${esc(CHARS[m.c].zh)}·${esc(m.t)}`).join('、')}</li>`).join('')}</ul></div>` : ''}
     <h2 class="h"><span>恶魔的伪装</span></h2>${bluffCard()}`;
+}
+// The seats in a circle like the real table: seat 1 at the top, then clockwise.
+// Storyteller: each token shows the character; players: only names, deaths and ghost votes.
+function ring(st, priv) {
+  const n = st.seats.length, R = n <= 8 ? 36 : 40, me = priv ? null : mySeat();
+  const aliveN = st.seats.filter(x => !x.dead).length;
+  return `<div class="ring" data-k="ring-${priv ? 'st' : 'pub'}-${n}"><div class="rc"><b>${phaseName(st.ph)}</b><span>存活 ${aliveN}/${n}</span>${st.ph?.k === 'day' ? `<span>处决需 ${Math.ceil(aliveN / 2)} 票</span>` : ''}</div>
+    ${st.seats.map((x, i) => {
+      const a = (-90 + 360 * i / n) * Math.PI / 180, pos = `left:${(50 + R * Math.cos(a)).toFixed(2)}%;top:${(50 + R * Math.sin(a)).toFixed(2)}%`;
+      const st2 = x.dead ? `<i class="sh">亡</i><i class="gv${x.ghost ? '' : ' used'}" title="${x.ghost ? '还有幽灵票' : '幽灵票已用'}">票</i>` : '';
+      return priv
+        ? `<button class="rt-s${x.dead ? ' dead' : ''}" style="${pos}" data-act="seat" data-i="${i}" data-k="g-${i}"><span class="rt-t t-${CHARS[x.role]?.team || ''}">${esc(CHARS[x.role]?.zh?.[0] || '?')}</span><span class="rt-n">${i + 1}</span>${x.marks.length ? `<span class="rt-m">${x.marks.length}</span>` : ''}<b>${esc(x.name)}</b><small class="t-${CHARS[x.role]?.team || ''}">${esc(CHARS[x.role]?.zh || '')}${x.bel ? '*' : ''}</small><span class="rt-st">${st2}</span></button>`
+        : `<div class="rt-s tw${x.dead ? ' dead' : ''}${i === me ? ' me' : ''}" style="${pos}" data-k="tw-${i}"><span class="rt-t">${i + 1}</span><b>${esc(x.name)}</b><span class="rt-st">${st2}</span></div>`;
+    }).join('')}</div>`;
+}
+
+// Under a step of tonight's list: what this character would truly learn (Storyteller's reference only).
+function infoBlock(x) {
+  if (!x.char || x.dead) return '';
+  const auto = autoInfo(S, x), P = PICKS[x.char], w = warnings(S, x.seat, x.char);
+  const math = S.seats.some(o => o.role === 'mathematician' || o.bel === 'mathematician') && x.char !== 'mathematician';
+  const abn = math && S.seats[x.seat].marks.some(m => m.c === 'mathematician' && m.t === '未正常生效');
+  if (!auto && !P && !w.length && !math) return '';
+  let calc = '';
+  if (P) {
+    const picks = ui.pick[x.k] || [], g = ui.jug[x.k] || {};
+    const can = (o, j) => x.char !== 'chambermaid' || (!o.dead && j !== x.seat);
+    const res = pickInfo(S, x, picks, g);
+    calc = `<div class="pk-calc"><span class="pc-tip">${P.tip}</span><div class="grid4">${S.seats.map((o, j) => `<button class="${picks.includes(j) ? 'on' : ''}${o.dead ? ' dim' : ''}" data-act="pick" data-k="${x.k}" data-i="${j}" ${can(o, j) ? '' : 'disabled'}>${j + 1}</button>`).join('')}</div>
+      ${x.char === 'juggler' ? picks.map(j => `<label class="jg">${seatNo(j)} 猜<select data-jug="${x.k}" data-i="${j}"><option value="">选角色</option>${edChars(S.ed).map(id => `<option value="${id}"${g[j] === id ? ' selected' : ''}>${esc(CHARS[id].zh)}</option>`).join('')}</select></label>`).join('') : ''}
+      ${res ? `<span class="ns-info-r">真实信息：${esc(res)}</span><button class="lnk" data-act="infolog" data-k="${x.k}" data-x="${esc(`选 ${picks.map(j => seatNo(j)).join(' ')} → ${res}`)}">写进这一步的记录</button>` : ''}</div>`;
+  }
+  return `<div class="ns-info">${auto ? `<span class="ns-info-r">真实信息：${esc(auto)}</span><button class="lnk" data-act="infolog" data-k="${x.k}" data-x="${esc(auto)}">写进这一步的记录</button>` : ''}${calc}
+    ${x.char === 'mathematician' && S.seats.some(o => o.marks.some(m => m.c === 'mathematician')) ? '<button class="lnk" data-act="clearabn">清掉所有「未正常生效」标记</button>' : ''}
+    ${w.map(t => `<em class="warn">${esc(t)}</em>`).join('')}
+    ${math ? `<button class="mkb sm${abn ? ' on' : ''}" data-act="mark" data-i="${x.seat}" data-c="mathematician" data-t="未正常生效">${abn ? '已标：能力未正常生效（数学家）' : '能力未正常生效？标记给数学家'}</button>` : ''}</div>`;
 }
 
 function logTab() {
@@ -313,7 +350,7 @@ function publicPage() {
     const past = st.noms.filter(x => x.d !== d);
     body = `${statusStrip(st)}${st.ph.k === 'night' ? '<div class="banner"><div><b>夜晚</b>：请闭上眼睛，放下手机。</div></div>' : ''}
       ${meBar}
-      <div class="town">${st.seats.map((x, i) => `<div class="tw${x.dead ? ' dead' : ''}${i === me ? ' me' : ''}" data-k="tw-${i}"><span class="sno">${i + 1}</span><b>${esc(x.name)}</b>${x.dead ? `<i class="sh">亡</i><i class="gv${x.ghost ? '' : ' used'}" title="${x.ghost ? '还有幽灵票' : '幽灵票已用'}">票</i>` : ''}</div>`).join('')}</div>
+      ${ring(st, false)}
       <p class="legend">「亡」已死亡；「票」死者还剩的一张幽灵票，用掉后变灰</p>
       ${d ? `<h2 class="h"><span>今天的提名</span><small>${today.length} 次</small></h2>${nomList(st, today)}` : ''}
       ${st.execs.length ? `<h2 class="h"><span>处决记录</span></h2><div class="card route"><ul class="dots">${st.execs.map(x => `<li>第 ${x.d} 天：${x.seat === null ? '没有处决' : `处决 ${who(st, x.seat)}${x.died ? '' : '（没有死亡）'}`}</li>`).join('')}</ul></div>` : ''}
@@ -546,13 +583,16 @@ document.addEventListener('click', async e => {
     case 'step': send({ t: 'step', k: d.k, on: !S.done[d.k] }); return;
     case 'dawn': { const left = nightList(S).filter(x => !S.done[x.k] && !x.dead).length; if (left) { ui.sheet = { k: 'dawn', left }; return render(); } send({ t: 'dawn' }); window.scrollTo(0, 0); return; }
     case 'dawnok': send({ t: 'dawn' }); ui.sheet = null; window.scrollTo(0, 0); return render();
-    case 'dusk': send({ t: 'dusk' }); window.scrollTo(0, 0); return;
+    case 'dusk': send({ t: 'dusk' }); ui.pick = {}; ui.jug = {}; window.scrollTo(0, 0); return;
     case 'seat': ui.sheet = { k: 'seat', i: +d.i }; return render();
     case 'dead': send({ t: 'dead', i: +d.i, dead: !S.seats[+d.i].dead }); return;
     case 'ghost': send({ t: 'ghost', i: +d.i, on: !S.seats[+d.i].ghost }); return;
     case 'mark': send({ t: 'mark', i: +d.i, c: d.c, x: d.t, on: !S.seats[+d.i].marks.some(m => m.c === d.c && m.t === d.t) }); return;
     case 'chrole': send({ t: 'seat', i: +d.i, role: d.id }); return;
     case 'nom': ui.nom = { by: null, on: null, votes: [] }; ui.sheet = { k: 'nom' }; return render();
+    case 'pick': { const k = d.k, i = +d.i, max = PICKS[k.split('@')[0]].k, v = ui.pick[k] || []; ui.pick[k] = v.includes(i) ? v.filter(x => x !== i) : [...v, i].slice(-max); return render(); }
+    case 'infolog': { const old = S.log.find(e => e.at === `N${S.ph.n}` && e.k === d.k)?.x; send({ t: 'log', k: d.k, x: old ? `${old}；${d.x}` : d.x }); toast('已写进记录'); return; }
+    case 'clearabn': S.seats.forEach((o, i) => { if (o.marks.some(m => m.c === 'mathematician' && m.t === '未正常生效')) send({ t: 'mark', i, c: 'mathematician', x: '未正常生效', on: false }); }); return;
     case 'nompick': ui.nom[d.key] = +d.i; return render();
     case 'nomback': if (ui.nom.on !== null) { ui.nom.on = null; ui.nom.votes = []; } else ui.nom.by = null; return render();
     case 'vote': { const i = +d.i, v = ui.nom.votes; ui.nom.votes = v.includes(i) ? v.filter(x => x !== i) : [...v, i]; return render(); }
@@ -577,6 +617,7 @@ document.addEventListener('input', e => {
 document.addEventListener('change', e => {
   const d = e.target.dataset;
   if (role !== 'st') return;
+  if (d.jug !== undefined) { ui.jug[d.jug] = { ...(ui.jug[d.jug] || {}), [d.i]: e.target.value }; return render(); }
   if (d.name !== undefined) send({ t: 'seat', i: +d.name, name: e.target.value });
   if (d.log !== undefined) send({ t: 'log', k: d.log, x: e.target.value });
 });

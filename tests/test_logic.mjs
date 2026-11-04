@@ -1,6 +1,7 @@
 // Data checks and rule unit tests (no server needed). Usage: node tests/test_logic.mjs
 import { initialState, reduce, publicView, setupCheck, threshold, onBlock, nightList, gameRecord, nameAction,
   EDITIONS, CHARS, STEPS, COUNTS } from '../public/logic.js';
+import { autoInfo, pickInfo, warnings, standing, poisonedByNoDashii } from '../public/info.js';
 
 let fails = 0;
 const ok = (name, cond, extra = '') => { if (!cond) fails++; console.log(cond ? 'PASS' : 'FAIL', name, cond ? '' : extra); };
@@ -121,6 +122,72 @@ ok('after the end everyone sees the grimoire, bluffs and log', over.seats.every(
 ok('record for the archive', gameRecord(S)?.seats.length === 9 && gameRecord(S).log.some(x => x.startsWith('首夜 [洗衣妇·1号]')));
 ok('players may only send their own name', nameAction({ t: 'seat', i: 0, name: 'x' }) && !nameAction({ t: 'seat', i: 0, name: 'x', role: 'imp' }) && !nameAction({ t: 'dead', i: 0 }));
 ok('reset keeps edition, count and names', (() => { const r = reduce(S, { t: 'reset' }); return r.stage === 'setup' && r.ed === 'tb' && r.n === 9 && r.seats[0].name === '玩家1' && !r.seats[0].role; })());
+
+/* ---------- what characters would truly learn (info.js) ---------- */
+const game = (ed, roles, extra = []) => run(initialState(), { t: 'setup', ed, n: roles.length }, { t: 'bag', ids: roles }, ...roles.map((id, i) => ({ t: 'seat', i, role: id })), ...extra, { t: 'start' });
+const info = (G, char, seat) => autoInfo(G, { char, seat });
+{
+  // seats 1–7 in a circle: 洗衣妇 共情者 占卜师 酒鬼(以为是厨师) 管家 男爵 小恶魔
+  const G = game('tb', ['washerwoman', 'empath', 'fortuneteller', 'drunk', 'butler', 'baron', 'imp'], [{ t: 'seat', i: 3, bel: 'chef' }]);
+  ok('chef: Baron and Imp sit together → 1 pair', info(G, 'chef', 3) === '相邻的邪恶玩家：1 对', info(G, 'chef', 3));
+  ok('empath: neighbours 1号 3号, none evil', info(G, 'empath', 1) === '两侧存活邻座 1号、3号，其中邪恶：0', info(G, 'empath', 1));
+  ok('the Drunk is flagged', warnings(G, 3, 'chef').some(w => w.includes('酒鬼')));
+  ok('empath at seat 7 side: Imp neighbours seat 1 and the Baron', info(G, 'empath', 0) === '两侧存活邻座 2号、7号，其中邪恶：1', info(G, 'empath', 0));
+  // the dead are skipped by the Empath
+  let D = run(G, { t: 'dead', i: 2, dead: true });
+  ok('empath skips the dead', info(D, 'empath', 1) === '两侧存活邻座 1号、4号，其中邪恶：0', info(D, 'empath', 1));
+  ok('washerwoman: the Townsfolk in play', info(G, 'washerwoman', 0) === '在场的镇民：2号 共情者、3号 占卜师');
+  ok('librarian: the Outsiders in play (the Drunk shows as the Drunk)', info(G, 'librarian', 0) === '在场的外来者：4号 酒鬼、5号 管家');
+  // fortune teller with a red herring
+  const F = run(G, { t: 'mark', i: 0, c: 'fortuneteller', x: '干扰项', on: true });
+  ok('fortune teller: Demon among the two → yes', pickInfo(F, { char: 'fortuneteller', seat: 2 }, [6, 4]).startsWith('其中有恶魔吗：是'));
+  ok('fortune teller: red herring → yes', pickInfo(F, { char: 'fortuneteller', seat: 2 }, [0, 1]).startsWith('其中有恶魔吗：是'));
+  ok('fortune teller: two good → no', pickInfo(F, { char: 'fortuneteller', seat: 2 }, [1, 4]) === '其中有恶魔吗：否');
+  ok('ravenkeeper: the character', pickInfo(F, { char: 'ravenkeeper', seat: 2 }, [5]) === '6号 的角色：男爵');
+  ok('a pick needs the right number of players', pickInfo(F, { char: 'fortuneteller', seat: 2 }, [1]) === null);
+  // undertaker after an execution that killed, and one that didn't
+  let U = run(G, { t: 'dawn' }, { t: 'nom', by: 0, on: 3, votes: [0, 1, 2, 4] }, { t: 'exec', seat: 3 }, { t: 'dusk' });
+  ok('undertaker: the Drunk is shown as the Drunk', info(U, 'undertaker', 0) === '今天被处决而死的 4号 是：酒鬼');
+  U = run(G, { t: 'dawn' }, { t: 'exec', seat: 3, died: false }, { t: 'dusk' });
+  ok('undertaker: executed but not dead → nothing', info(U, 'undertaker', 0).startsWith('今天没有人被处决而死'));
+}
+{
+  // the Recluse sitting next to the Imp: the Chef may get 0 or 1
+  const R = game('tb', ['washerwoman', 'empath', 'recluse', 'imp', 'chef', 'poisoner', 'monk']);
+  ok('chef with the Recluse next to the Imp: 0～1', info(R, 'chef', 4).startsWith('相邻的邪恶玩家：0～1'), info(R, 'chef', 4));
+  ok('empath next to the Recluse: 0～1', info(R, 'empath', 1).includes('其中邪恶：0～1'), info(R, 'empath', 1));
+  ok('investigator: the Recluse may show as a Minion', info(R, 'investigator', 0).includes('3号 陌客（可能被当作爪牙）'));
+  const P = run(R, { t: 'mark', i: 1, c: 'poisoner', x: '中毒', on: true });
+  ok('poisoned player flagged', warnings(P, 1, 'empath').some(w => w.includes('投毒者·中毒')));
+}
+{
+  // 梦殒春宵: 1 钟表匠 2 城镇公告员 3 卖花女孩 4 诺-达鲺 5 心上人 6 女巫 7 数学家 8 神谕者 9 茶艺师? (not in S&V) → 艺术家
+  const V = game('snv', ['clockmaker', 'towncrier', 'flowergirl', 'nodashii', 'sweetheart', 'witch', 'mathematician', 'oracle', 'artist', 'mutant']);
+  ok('clockmaker: Demon (4号) to nearest Minion (6号) = 2 steps', info(V, 'clockmaker', 0) === '恶魔到最近的爪牙：2 步', info(V, 'clockmaker', 0));
+  ok('No Dashii poisons the closest Townsfolk both ways, skipping the Outsider', JSON.stringify(poisonedByNoDashii(V).sort()) === '[2,6]', JSON.stringify(poisonedByNoDashii(V)));
+  ok('standing effects list the No Dashii poison', standing(V).some(t => t.includes('3号') && t.includes('7号')));
+  ok('the poisoned Mathematician is warned', warnings(V, 6, 'mathematician').some(w => w.includes('诺-达鲺')));
+  let W = run(V, { t: 'dawn' }, { t: 'nom', by: 5, on: 0, votes: [3, 1] }, { t: 'nom', by: 1, on: 2, votes: [] }, { t: 'exec', seat: null }, { t: 'dusk' });
+  ok('town crier: a Minion (the Witch) nominated → yes', info(W, 'towncrier', 1) === '今天有爪牙提名过吗：是');
+  ok('flowergirl: the Demon voted → yes', info(W, 'flowergirl', 2) === '今天恶魔投过票吗：是');
+  W = run(V, { t: 'dawn' }, { t: 'nom', by: 1, on: 2, votes: [0] }, { t: 'exec', seat: null }, { t: 'dusk' });
+  ok('town crier: no Minion nominated → no', info(W, 'towncrier', 1) === '今天有爪牙提名过吗：否');
+  ok('flowergirl: the Demon did not vote → no', info(W, 'flowergirl', 2) === '今天恶魔投过票吗：否');
+  W = run(W, { t: 'dead', i: 5, dead: true }, { t: 'dead', i: 4, dead: true });
+  ok('oracle: dead evil players', info(W, 'oracle', 7) === '死亡玩家里邪恶的：1 名');
+  W = run(W, { t: 'mark', i: 1, c: 'mathematician', x: '未正常生效', on: true }, { t: 'mark', i: 2, c: 'mathematician', x: '未正常生效', on: true });
+  ok('mathematician: counts the 未正常生效 reminders', info(W, 'mathematician', 6).startsWith('标了「未正常生效」的：2 人（2号、3号）'));
+  ok('seamstress: same alignment?', pickInfo(W, { char: 'seamstress', seat: 0 }, [3, 5]) === '同一阵营吗：是' && pickInfo(W, { char: 'seamstress', seat: 0 }, [3, 1]) === '同一阵营吗：否');
+  ok('juggler: counts right guesses', pickInfo(W, { char: 'juggler', seat: 0 }, [3, 5, 1], { 3: 'nodashii', 5: 'witch', 1: 'oracle' }) === '猜中：2 个');
+}
+{
+  // Tea Lady (黯月初升): both alive neighbours good → they can't die
+  const T = game('bmr', ['tealady', 'grandmother', 'sailor', 'chambermaid', 'zombuul', 'godfather', 'exorcist']);
+  ok('tea lady protects good neighbours', standing(T).some(t => t.includes('2号、7号') && t.includes('不会死亡')), JSON.stringify(standing(T)));
+  ok('godfather: no Outsiders in play', info(T, 'godfather', 5) === '在场的外来者：场上没有外来者');
+  const C = run(T, { t: 'step', k: 'sailor@2', on: true }, { t: 'step', k: 'exorcist@6', on: true });
+  ok('chambermaid: counts ticked players among the two', pickInfo(C, { char: 'chambermaid', seat: 3 }, [2, 1]).startsWith('今晚因自己能力醒来的：1 人'));
+}
 
 console.log(fails ? `\n${fails} FAILED` : '\nall passed');
 process.exit(fails ? 1 : 0);

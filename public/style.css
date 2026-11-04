@@ -558,12 +558,39 @@ body.has-chat{padding-bottom:72px}
 .mebar b{font:600 18px var(--num);color:var(--gold2)}
 .mebar .btn{width:auto;padding:0 12px}
 .pseat{display:flex;align-items:center;gap:10px;padding:8px 10px;font:700 15px var(--sans)}
-.pseat.me,.tw.me{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold) inset}
-.town{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px}
-.tw{display:flex;align-items:center;gap:6px;min-height:42px;padding:5px 8px;border-radius:8px;border:1px solid var(--line);background:var(--panel);font:700 14px var(--sans)}
-.tw b{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.tw.dead{background:repeating-linear-gradient(135deg,rgba(0,0,0,.35) 0 6px,rgba(50,30,30,.35) 6px 12px),var(--panel)}
-.tw.dead b{color:var(--ink2);text-decoration:line-through}
+.pseat.me{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold) inset}
+/* the seats in a circle (grimoire and town square) */
+.ring{position:relative;width:100%;max-width:400px;aspect-ratio:1;margin:12px auto 0;border-radius:50%;
+  background:radial-gradient(circle,rgba(163,22,42,.16) 0 30%,transparent 31%),radial-gradient(circle,transparent 0 47%,rgba(214,170,110,.14) 47.3% 47.8%,transparent 48.1%)}
+.rc{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center}
+.rc b{font:900 17px var(--serif);letter-spacing:2px;color:var(--gold2)}
+.rc span{font:600 12px var(--sans);color:var(--ink2)}
+.rt-s{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;width:58px;padding:0;border:none;background:none;color:var(--ink);font:inherit}
+.rt-t{display:grid;place-items:center;width:42px;height:42px;border-radius:50%;border:2px solid rgba(255,255,255,.6);
+  background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.28),transparent 55%),var(--tc,#4a3530);color:#fff;font:900 18px/1 var(--serif);box-shadow:0 2px 6px rgba(0,0,0,.55)}
+.tw .rt-t{font:600 17px var(--num);color:var(--gold2);background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.12),transparent 55%),#2a1616;border-color:var(--line2)}
+.rt-s b{max-width:62px;margin-top:2px;font:700 11.5px/1.25 var(--sans);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rt-s small{max-width:62px;font:600 10px/1.2 var(--sans);color:var(--tc);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rt-n{position:absolute;top:-5px;left:2px;min-width:18px;height:18px;padding:0 3px;border-radius:9px;border:1px solid var(--gold);background:#1b0f10;font:600 11px/16px var(--num);color:var(--gold2)}
+.rt-m{position:absolute;top:-5px;right:2px;min-width:18px;height:18px;border-radius:9px;background:var(--red2);font:700 11px/18px var(--sans);color:#fff}
+.rt-st{display:flex;gap:2px;margin-top:1px}
+.rt-st .sh,.rt-st .gv{width:17px;height:17px;font-size:9.5px}
+.rt-s.dead .rt-t{filter:grayscale(.85) brightness(.55)}
+.rt-s.dead b{color:var(--ink3);text-decoration:line-through}
+.tw.me .rt-t{border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,164,92,.35)}
+@media (max-width:360px){.rt-s{width:50px}.rt-t{width:36px;height:36px;font-size:15px}.rt-s b,.rt-s small{max-width:52px}}
+/* what a character would truly learn (Storyteller only) */
+.ns-stand{margin-top:10px;padding:8px 12px;border-color:rgba(221,65,82,.45)}
+.ns-stand p{font:600 13.5px/1.6 var(--sans);color:#f3b8bf}
+.ns-info{display:flex;flex-direction:column;align-items:flex-start;gap:5px;margin-top:6px;padding:7px 9px;border-radius:7px;border:1px dashed rgba(201,164,92,.5);background:rgba(201,164,92,.07)}
+.ns-info-r{font:700 14px/1.55 var(--sans);color:var(--gold2)}
+.ns-info em.warn{font:600 12.5px/1.5 var(--sans);font-style:normal;color:#f3a0aa}
+.pk-calc{display:flex;flex-direction:column;gap:6px;width:100%}
+.pc-tip{font:600 12.5px var(--sans);color:var(--ink2)}
+.pk-calc .grid4 button{height:34px}
+.jg{display:flex;align-items:center;gap:6px;font:600 13px var(--sans)}
+.jg select{flex:1;height:32px;border-radius:6px;border:1px solid var(--line2);background:rgba(0,0,0,.3);color:var(--ink);font:500 14px var(--sans)}
+.mkb.sm{min-height:28px;padding:0 10px;font-size:12px}
 .nrow{display:flex;align-items:center;gap:8px;padding:6px 8px}
 .nrow b{flex:none;width:30%;font:700 14px var(--sans);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .nrow b small{margin-left:4px;padding:0 5px;border-radius:7px;background:var(--gold);color:#2a1a00;font:700 10.5px var(--sans)}
