@@ -137,7 +137,7 @@
 
 - 本项目是非官方的玩家工具，与 The Pandemonium Institute、集石无关；免费、无广告、不上架应用商店。参照 [TPI 社区内容政策](https://bloodontheclocktower.com/pages/community-created-content-policy)。
 - 角色只用官方中文名。能力简述、说书人提示、规则讲解和常见问题都是本站自写，不照搬官方英文或集石中文的能力文字。抽查 72 条简述与集石原文，最长重合 8 个字，都是"他们不会死亡"这类通用说法。
-- 不用官方角色图标和美术：角色用"首字 + 阵营颜色"的文字徽章代替。
+- 角色头像用 TPI 向社区工具开放的官方角色图标（[botc-release/resources/characters](https://github.com/ThePandemoniumInstitute/botc-release/tree/main/resources/characters)，镇民和外来者用善良版、爪牙和恶魔用邪恶版，缩小到 128px 放在 `public/img/roles/`），按资源说明在页脚展示官方"Community Created Content"标识（`public/img/ccc.png`）。中国大陆的中文版权在集石，如被要求可以随时换回文字徽章。
 - 首页封面是集石中文版《染·钟楼谜团》游戏盒封面原图（取自集石游戏页），未经 AI 重绘，封面版权归出版社所有。
 - 网站图标、教程横幅、规则助手欢迎图是用 Codex 生成的原创插画。
 - 规则助手不对角色之间有歧义的互动下定论，最终以说书人裁定为准。

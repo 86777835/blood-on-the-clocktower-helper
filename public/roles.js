@@ -13,7 +13,7 @@ function render() {
     <details class="card ref" style="margin-top:10px"><summary>首夜顺序</summary>${nightOrder(ed, true)}</details>
     <details class="card ref" style="margin-top:8px"><summary>其他夜晚顺序</summary>${nightOrder(ed, false)}</details>
     <a class="btn ghost" href="guide">规则介绍与常见问题</a><a class="btn ghost" href="./">返回首页</a>
-    <footer>非官方玩家工具 · 角色名为集石官方中文名，能力简述为本站自写，夜晚顺序依据官方 nightsheet 数据</footer>`;
+    <footer>非官方玩家工具 · 角色名为集石官方中文名，能力简述为本站自写，夜晚顺序依据官方 nightsheet 数据<br>角色图标来自 The Pandemonium Institute 向社区工具开放的官方资源<br><img class="ccc" src="img/ccc.png" alt="Community Created Content"></footer>`;
 }
 el.addEventListener('click', e => { const b = e.target.closest('[data-ed]'); if (b) { ed = b.dataset.ed; history.replaceState(null, '', '#' + ed); render(); } });
 render();

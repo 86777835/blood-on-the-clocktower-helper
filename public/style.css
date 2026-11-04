@@ -623,3 +623,14 @@ ol.no-list .cb{width:22px;height:22px;font-size:11px}
 .back-pill{display:inline-flex;align-items:center;min-height:36px;padding:0 13px;border:1px solid var(--line2);border-radius:999px;background:var(--panel);color:var(--gold2);font:600 14px var(--sans);text-decoration:none}
 .back-pill:hover,.back-pill:focus-visible{background:var(--panel2);border-color:var(--gold)}
 .back-nav + .hero,.back-nav + .hero-box{padding-top:22px}
+
+/* official character icons on a parchment token, ringed in the team colour */
+.cb.ic,.rt-t.ic{overflow:hidden;background:radial-gradient(circle at 40% 35%,#fbf4e3,#e3d3b0 70%,#c9b48a);border:2px solid var(--tc,#8a7a5c);padding:0}
+.cb img,.rt-t.ic img{display:block;width:100%;height:100%;object-fit:contain}
+.rt-t.ic{width:44px;height:44px}
+.rt-s.dead .rt-t.ic{filter:grayscale(1) brightness(.5)}
+img.ccc{display:block;width:110px;height:auto;margin:8px auto 0;opacity:.85}
+.cl .cb.ic{width:38px;height:38px;margin-right:8px}
+.pkc .cb.ic{width:30px;height:30px}
+.grim .cb.ic,.bluffs .cb.ic{width:32px;height:32px}
+.ns-b > b .cb.ic{width:30px;height:30px}

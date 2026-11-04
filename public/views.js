@@ -4,8 +4,9 @@ import { EDITIONS, CHARS, STEPS, TEAM_ZH } from './data.js';
 export const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 export const TEAMS = ['townsfolk', 'outsider', 'minion', 'demon'];
 
-// A text badge instead of the official icon: the first character of the name, in the team's colour.
-export const badge = id => CHARS[id] ? `<span class="cb t-${CHARS[id].team}">${esc(CHARS[id].zh[0])}</span>` : '<span class="cb">?</span>';
+// The character's official icon (TPI's toolmaker resources, botc-release/resources/characters) on a parchment token.
+export const icon = id => `<img src="img/roles/${id}.webp" alt="${esc(CHARS[id].zh)}" loading="lazy">`;
+export const badge = id => CHARS[id] ? `<span class="cb ic t-${CHARS[id].team}">${icon(id)}</span>` : '<span class="cb">?</span>';
 export const cname = id => CHARS[id] ? `<span class="cnm t-${CHARS[id].team}">${esc(CHARS[id].zh)}</span>` : '';
 
 // The script's characters by team, each with this site's own one-line summary.

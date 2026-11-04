@@ -49,7 +49,7 @@ open(out, 'w').write(f'''<!doctype html>
 {faq_html}
 <a class="btn" href="./">返回首页</a>
 <a class="btn ghost" href="roles">三个剧本的角色表</a>
-<footer>非官方玩家工具，与 The Pandemonium Institute、集石无关 · 规则依据官方 Wiki 与集石钟楼百科，文字为本站自写</footer>
+<footer>非官方玩家工具，与 The Pandemonium Institute、集石无关 · 规则依据官方 Wiki 与集石钟楼百科，文字为本站自写<br><img class="ccc" src="img/ccc.png" alt="Community Created Content"></footer>
 </div>
 <script type="module" src="chat.js"></script>
 </body>

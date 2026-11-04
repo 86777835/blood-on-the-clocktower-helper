@@ -1,6 +1,6 @@
 import { setupCheck, threshold, onBlock, nightList, phaseName, teamOf, isGood, BELIEVE, stepLabel, edChars,
   MIN_PLAYERS, MAX_PLAYERS, EDITIONS, CHARS, STEPS, TEAM_ZH } from './logic.js';
-import { esc, badge, cname, charList, nightOrder, TEAMS } from './views.js';
+import { esc, badge, icon, cname, charList, nightOrder, TEAMS } from './views.js';
 import { autoInfo, pickInfo, PICKS, warnings, standing } from './info.js';
 
 const $ = s => document.querySelector(s);
@@ -119,7 +119,7 @@ function landing() {
     <h2 class="h"><span>我的房间</span><small>本机当说书人的房间</small></h2>
     <div class="list">${my.length ? my.map(r => `<button class="card lobby" data-act="rejoin" data-code="${r.code}" data-k="lb-${r.code}">
         <span class="lc">${r.code}</span><span class="lp">说书人</span><span class="ls">${ago(r.t)}</span></button>`).join('') : '<div class="empty">还没有房间</div>'}</div>
-    <footer>非官方玩家工具，与 The Pandemonium Institute、集石无关 · 免费、无广告<br>规则依据官方 Wiki 与集石钟楼百科，角色简述为本站自写<br>封面为官方游戏盒封面（集石中文版《染·钟楼谜团》），封面版权归出版社所有</footer></div>`;
+    <footer>非官方玩家工具，与 The Pandemonium Institute、集石无关 · 免费、无广告<br>规则依据官方 Wiki 与集石钟楼百科，角色简述为本站自写<br>封面为官方游戏盒封面（集石中文版《染·钟楼谜团》），封面版权归出版社所有<br>角色图标来自 The Pandemonium Institute 向社区工具开放的官方资源<br><img class="ccc" src="img/ccc.png" alt="Community Created Content"></footer></div>`;
 }
 function ago(t) { const m = Math.floor((Date.now() - t) / 60000); return m < 1 ? '刚刚' : m < 60 ? `${m} 分钟前` : m < 1440 ? `${Math.floor(m / 60)} 小时前` : `${Math.floor(m / 1440)} 天前`; }
 
@@ -252,7 +252,7 @@ function ring(st, priv) {
       const a = (-90 + 360 * i / n) * Math.PI / 180, pos = `left:${(50 + R * Math.cos(a)).toFixed(2)}%;top:${(50 + R * Math.sin(a)).toFixed(2)}%`;
       const st2 = x.dead ? `<i class="sh">亡</i><i class="gv${x.ghost ? '' : ' used'}" title="${x.ghost ? '还有幽灵票' : '幽灵票已用'}">票</i>` : '';
       return priv
-        ? `<button class="rt-s${x.dead ? ' dead' : ''}" style="${pos}" data-act="seat" data-i="${i}" data-k="g-${i}"><span class="rt-t t-${CHARS[x.role]?.team || ''}">${esc(CHARS[x.role]?.zh?.[0] || '?')}</span><span class="rt-n">${i + 1}</span>${x.marks.length ? `<span class="rt-m">${x.marks.length}</span>` : ''}<b>${esc(x.name)}</b><small class="t-${CHARS[x.role]?.team || ''}">${esc(CHARS[x.role]?.zh || '')}${x.bel ? '*' : ''}</small><span class="rt-st">${st2}</span></button>`
+        ? `<button class="rt-s${x.dead ? ' dead' : ''}" style="${pos}" data-act="seat" data-i="${i}" data-k="g-${i}"><span class="rt-t ic t-${CHARS[x.role]?.team || ''}">${CHARS[x.role] ? icon(x.role) : '?'}</span><span class="rt-n">${i + 1}</span>${x.marks.length ? `<span class="rt-m">${x.marks.length}</span>` : ''}<b>${esc(x.name)}</b><small class="t-${CHARS[x.role]?.team || ''}">${esc(CHARS[x.role]?.zh || '')}${x.bel ? '*' : ''}</small><span class="rt-st">${st2}</span></button>`
         : `<div class="rt-s tw${x.dead ? ' dead' : ''}${i === me ? ' me' : ''}" style="${pos}" data-k="tw-${i}"><span class="rt-t">${i + 1}</span><b>${esc(x.name)}</b><span class="rt-st">${st2}</span></div>`;
     }).join('')}</div>`;
 }
