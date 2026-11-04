@@ -1,0 +1,1653 @@
+{
+  "editions": [
+    {
+      "id": "tb",
+      "zh": "暗流涌动",
+      "en": "Trouble Brewing",
+      "alias": [
+        "灾祸滋生"
+      ]
+    },
+    {
+      "id": "bmr",
+      "zh": "黯月初升",
+      "en": "Bad Moon Rising",
+      "alias": [
+        "血月升起"
+      ]
+    },
+    {
+      "id": "snv",
+      "zh": "梦殒春宵",
+      "en": "Sects & Violets",
+      "alias": [
+        "紫罗兰教派"
+      ]
+    }
+  ],
+  "nightSteps": [
+    {
+      "id": "dusk",
+      "zh": "黄昏",
+      "firstNight": 1,
+      "otherNight": 1,
+      "stFirst": "确认所有人都已闭眼，夜晚开始。",
+      "stOther": "确认所有人都已闭眼，夜晚开始。"
+    },
+    {
+      "id": "minioninfo",
+      "zh": "爪牙信息",
+      "firstNight": 20,
+      "otherNight": 0,
+      "stFirst": "7人及以上：唤醒全部爪牙，让他们互相认识，并指出谁是恶魔。",
+      "stOther": ""
+    },
+    {
+      "id": "demoninfo",
+      "zh": "恶魔信息",
+      "firstNight": 24,
+      "otherNight": 0,
+      "stFirst": "7人及以上：唤醒恶魔，指出其爪牙，再亮出3个不在场的善良角色供其伪装。",
+      "stOther": ""
+    },
+    {
+      "id": "dawn",
+      "zh": "黎明",
+      "firstNight": 78,
+      "otherNight": 98,
+      "stFirst": "稍等片刻后宣布天亮，请所有人睁眼。",
+      "stOther": "稍等片刻后宣布天亮，请所有人睁眼，公布昨夜死亡的玩家。"
+    }
+  ],
+  "characters": [
+    {
+      "id": "washerwoman",
+      "en": "Washerwoman",
+      "zh": "洗衣妇",
+      "edition": "tb",
+      "team": "townsfolk",
+      "gist": "开局得知两名玩家，其中一人是某个指定的镇民角色。",
+      "firstNight": 52,
+      "otherNight": 0,
+      "stFirst": "指向标了“镇民”“错误”的两名玩家，亮出那名镇民的角色标记。",
+      "stOther": "",
+      "reminders": [
+        "镇民",
+        "错误"
+      ],
+      "remindersGlobal": [],
+      "setup": false,
+      "setupNote": "",
+      "outsiderMod": [
+        0
+      ],
+      "src": "https://wiki.bloodontheclocktower.com/Washerwoman"
+    },
+    {
+      "id": "librarian",
+      "en": "Librarian",
+      "zh": "图书管理员",
+      "edition": "tb",
+      "team": "townsfolk",
+      "gist": "开局得知两名玩家中有一人是某个外来者；无外来者则得知为零。",
+      "firstNight": 53,
+      "otherNight": 0,
+      "stFirst": "指向两名玩家并亮出外来者角色标记；场上无外来者时比 0。",
+      "stOther": "",
+      "reminders": [
+        "外来者",
+        "错误"
+      ],
+      "remindersGlobal": [],
+      "setup": false,
+      "setupNote": "",
+      "outsiderMod": [
+        0
+      ],
+      "src": "https://wiki.bloodontheclocktower.com/Librarian"
+    },
+    {
+      "id": "investigator",
+      "en": "Investigator",
+      "zh": "调查员",
+      "edition": "tb",
+      "team": "townsfolk",
+      "gist": "开局得知两名玩家中有一人是某个指定的爪牙角色。",
+      "firstNight": 54,
+      "otherNight": 0,
+      "stFirst": "指向两名玩家并亮出其中一人的爪牙角色标记。",
+      "stOther": "",
+      "reminders": [
+        "爪牙",
+        "错误"
+      ],
+      "remindersGlobal": [],
+      "setup": false,
+      "setupNote": "",
+      "outsiderMod": [
+        0
+      ],
+      "src": "https://wiki.bloodontheclocktower.com/Investigator"
+    },
+    {
+      "id": "chef",
+      "en": "Chef",
+      "zh": "厨师",
+      "edition": "tb",
+      "team": "townsfolk",
+      "gist": "开局得知场上有几对相邻而坐的邪恶玩家。",
+      "firstNight": 55,
+      "otherNight": 0,
+      "stFirst": "用手指比出邪恶玩家相邻成对的数量。",
+      "stOther": "",
+      "reminders": [],
+      "remindersGlobal": [],
+      "setup": false,
+      "setupNote": "",
+      "outsiderMod": [
+        0
+      ],
+      "src": "https://wiki.bloodontheclocktower.com/Chef"
+    },
+    {
+      "id": "empath",
+      "en": "Empath",
+      "zh": "共情者",
+      "edition": "tb",
+      "team": "townsfolk",
+      "gist": "每晚得知左右最近的两名存活邻座里有几名邪恶。",
+      "firstNight": 56,
+      "otherNight": 76,
+      "stFirst": "用手指比出两侧存活邻座中的邪恶人数（0–2）。",
+      "stOther": "用手指比出两侧存活邻座中的邪恶人数（0–2）。",
+      "reminders": [],
+      "remindersGlobal": [],
+      "setup": false,
+      "setupNote": "",
+      "outsiderMod": [
+        0
+      ],
+      "src": "https://wiki.bloodontheclocktower.com/Empath"
+    },
+    {
+      "id": "fortuneteller",
+      "en": "Fortune Teller",
+      "zh": "占卜师",
+      "edition": "tb",
+      "team": "townsfolk",
+      "gist": "每晚查两名玩家里有没有恶魔；另有一名善良玩家会被误报为恶魔。",
+      "firstNight": 57,
+      "otherNight": 77,
+      "stFirst": "让其指两名玩家；任一是恶魔或“干扰项”就点头，否则摇头。",
+      "stOther": "让其指两名玩家；任一是恶魔或“干扰项”就点头，否则摇头。",
+      "reminders": [
+        "干扰项"
+      ],
+      "remindersGlobal": [],
+      "setup": false,
+      "setupNote": "",
+      "outsiderMod": [
+        0
+      ],
+      "src": "https://wiki.bloodontheclocktower.com/Fortune_Teller"
+    },
+    {
+      "id": "undertaker",
+      "en": "Undertaker",
+      "zh": "送葬者",
+      "edition": "tb",
+      "team": "townsfolk",
+      "gist": "每晚（首夜除外）得知当天被处决者的真实角色。",
+      "firstNight": 0,
+      "otherNight": 78,
+      "stFirst": "",
+      "stOther": "若今天有人被处决，亮出该玩家的角色标记；无人被处决则不唤醒。",
+      "reminders": [
+        "死于今日"
+      ],
+      "remindersGlobal": [],
+      "setup": false,
+      "setupNote": "",
+      "outsiderMod": [
+        0
+      ],
+      "src": "https://wiki.bloodontheclocktower.com/Undertaker"
+    },
+    {
+      "id": "monk",
+      "en": "Monk",
+      "zh": "僧侣",
+      "edition": "tb",
+      "team": "townsfolk",
+      "gist": "每晚（首夜除外）护住一名其他玩家，当晚不受恶魔伤害。",
+      "firstNight": 0,
+      "otherNight": 24,
+      "stFirst": "",
+      "stOther": "让其指一名非自己的玩家，在该玩家旁放“保护”。",
+      "reminders": [
+        "保护"
+      ],
+      "remindersGlobal": [],
+      "setup": false,
+      "setupNote": "",
+      "outsiderMod": [
+        0
+      ],
+      "src": "https://wiki.bloodontheclocktower.com/Monk"
+    },
+    {
+      "id": "ravenkeeper",
+      "en": "Ravenkeeper",
+      "zh": "守鸦人",
+      "edition": "tb",
+      "team": "townsfolk",
+      "gist": "若在夜里死亡，被唤醒查看一名玩家的角色。",
+      "firstNight": 0,
+      "otherNight": 75,
+      "stFirst": "",
+      "stOther": "若其今晚死亡：唤醒，让其指一名玩家，亮出该玩家的角色标记。",
+      "reminders": [],
+      "remindersGlobal": [],
+      "setup": false,
+      "setupNote": "",
+      "outsiderMod": [
+        0
+      ],
+      "src": "https://wiki.bloodontheclocktower.com/Ravenkeeper"
+    },
+    {
+      "id": "virgin",
+      "en": "Virgin",
+      "zh": "贞洁者",
+      "edition": "tb",
+      "team": "townsfolk",
+      "gist": "第一次被提名时，若提名者是镇民，提名者立刻被处决。",
+      "firstNight": 0,
+      "otherNight": 0,
+      "stFirst": "",
+      "stOther": "",
+      "reminders": [
+        "失去能力"
+      ],
+      "remindersGlobal": [],
+      "setup": false,
+      "setupNote": "",
+      "outsiderMod": [
+        0
+      ],
+      "src": "https://wiki.bloodontheclocktower.com/Virgin"
+    },
+    {
+      "id": "slayer",
+      "en": "Slayer",
+      "zh": "猎手",
+      "edition": "tb",
+      "team": "townsfolk",
+      "gist": "每局一次，白天公开指定一人；若他是恶魔则死亡。",
+      "firstNight": 0,
+      "otherNight": 0,
+      "stFirst": "",
+      "stOther": "",
+      "reminders": [
+        "失去能力"
+      ],
+      "remindersGlobal": [],
+      "setup": false,
+      "setupNote": "",
+      "outsiderMod": [
+        0
+      ],
+      "src": "https://wiki.bloodontheclocktower.com/Slayer"
+    },
+    {
+      "id": "soldier",
+      "en": "Soldier",
+      "zh": "士兵",
+      "edition": "tb",
+      "team": "townsfolk",
+      "gist": "恶魔杀不死你。",
+      "firstNight": 0,
+      "otherNight": 0,
+      "stFirst": "",
+      "stOther": "",
+      "reminders": [],
+      "remindersGlobal": [],
+      "setup": false,
+      "setupNote": "",
+      "outsiderMod": [
+        0
+      ],
+      "src": "https://wiki.bloodontheclocktower.com/Soldier"
+    },
+    {
+      "id": "mayor",
+      "en": "Mayor",
+      "zh": "镇长",
+      "edition": "tb",
+      "team": "townsfolk",
+      "gist": "只剩三人存活且当天无人被处决时善良获胜；夜里被杀可能有人替死。",
+      "firstNight": 0,
+      "otherNight": 0,
+      "stFirst": "",
+      "stOther": "",
+      "reminders": [],
+      "remindersGlobal": [],
+      "setup": false,
+      "setupNote": "",
+      "outsiderMod": [
+        0
+      ],
+      "src": "https://wiki.bloodontheclocktower.com/Mayor"
+    },
+    {
+      "id": "butler",
+      "en": "Butler",
+      "zh": "管家",
+      "edition": "tb",
+      "team": "outsider",
+      "gist": "每晚选一名“主人”；次日仅当主人投票时你才可投票。",
+      "firstNight": 58,
+      "otherNight": 91,
+      "stFirst": "让其指一名非自己的玩家，在该玩家旁放“主人”。",
+      "stOther": "让其指一名非自己的玩家，在该玩家旁放“主人”。",
+      "reminders": [
+        "主人"
+      ],
+      "remindersGlobal": [],
+      "setup": false,
+      "setupNote": "",
+      "outsiderMod": [
+        0
+      ],
+      "src": "https://wiki.bloodontheclocktower.com/Butler"
+    },
+    {
+      "id": "drunk",
+      "en": "Drunk",
+      "zh": "酒鬼",
+      "edition": "tb",
+      "team": "outsider",
+      "gist": "以为自己是某个镇民，实际是酒鬼，所得信息与能力都不可靠。",
+      "firstNight": 0,
+      "otherNight": 0,
+      "stFirst": "",
+      "stOther": "",
+      "reminders": [],
+      "remindersGlobal": [
+        "是酒鬼"
+      ],
+      "setup": true,
+      "setupNote": "一名外来者位置实为酒鬼：从镇民中另取一个不在场的标记给该玩家，他以为自己是该镇民",
+      "outsiderMod": [
+        0
+      ],
+      "src": "https://wiki.bloodontheclocktower.com/Drunk"
+    },
+    {
+      "id": "recluse",
+      "en": "Recluse",
+      "zh": "陌客",
+      "edition": "tb",
+      "team": "outsider",
+      "gist": "可能被当作邪恶，或当作爪牙、恶魔，死后依然如此。",
+      "firstNight": 0,
+      "otherNight": 0,
+      "stFirst": "",
+      "stOther": "",
+      "reminders": [],
+      "remindersGlobal": [],
+      "setup": false,
+      "setupNote": "",
+      "outsiderMod": [
+        0
+      ],
+      "src": "https://wiki.bloodontheclocktower.com/Recluse"
+    },
+    {
+      "id": "saint",
+      "en": "Saint",
+      "zh": "圣徒",
+      "edition": "tb",
+      "team": "outsider",
+      "gist": "若被处决而死，善良阵营直接落败。",
+      "firstNight": 0,
+      "otherNight": 0,
+      "stFirst": "",
+      "stOther": "",
+      "reminders": [],
+      "remindersGlobal": [],
+      "setup": false,
+      "setupNote": "",
+      "outsiderMod": [
+        0
+      ],
+      "src": "https://wiki.bloodontheclocktower.com/Saint"
+    },
+    {
+      "id": "poisoner",
+      "en": "Poisoner",
+      "zh": "投毒者",
+      "edition": "tb",
+      "team": "minion",
+      "gist": "每晚毒一名玩家，效果持续到次日白天结束。",
+      "firstNight": 33,
+      "otherNight": 17,
+      "stFirst": "让其指一名玩家，在该玩家旁放“中毒”。",
+      "stOther": "让其指一名玩家，把“中毒”移到该玩家旁。",
+      "reminders": [
+        "中毒"
+      ],
+      "remindersGlobal": [],
+      "setup": false,
+      "setupNote": "",
+      "outsiderMod": [
+        0
+      ],
+      "src": "https://wiki.bloodontheclocktower.com/Poisoner"
+    },
+    {
+      "id": "spy",
+      "en": "Spy",
+      "zh": "间谍",
+      "edition": "tb",
+      "team": "minion",
+      "gist": "每晚可翻看魔典；可能被当作善良的镇民或外来者。",
+      "firstNight": 72,
+      "otherNight": 92,
+      "stFirst": "把魔典给其查看，看完收回。",
+      "stOther": "把魔典给其查看，看完收回。",
+      "reminders": [],
+      "remindersGlobal": [],
+      "setup": false,
+      "setupNote": "",
+      "outsiderMod": [
+        0
+      ],
+      "src": "https://wiki.bloodontheclocktower.com/Spy"
+    },
+    {
+      "id": "scarletwoman",
+      "en": "Scarlet Woman",
+      "zh": "红唇女郎",
+      "edition": "tb",
+      "team": "minion",
+      "gist": "存活不少于五人时恶魔死亡，你接任成为恶魔。",
+      "firstNight": 0,
+      "otherNight": 33,
+      "stFirst": "",
+      "stOther": "若其今天已接任恶魔：唤醒，亮出“你是”和对应恶魔标记。",
+      "reminders": [
+        "是恶魔"
+      ],
+      "remindersGlobal": [],
+      "setup": false,
+      "setupNote": "",
+      "outsiderMod": [
+        0
+      ],
+      "src": "https://wiki.bloodontheclocktower.com/Scarlet_Woman"
+    },
+    {
+      "id": "baron",
+      "en": "Baron",
+      "zh": "男爵",
+      "edition": "tb",
+      "team": "minion",
+      "gist": "开局场上会多出外来者。",
+      "firstNight": 0,
+      "otherNight": 0,
+      "stFirst": "",
+      "stOther": "",
+      "reminders": [],
+      "remindersGlobal": [],
+      "setup": true,
+      "setupNote": "+2 外来者",
+      "outsiderMod": [
+        2
+      ],
+      "src": "https://wiki.bloodontheclocktower.com/Baron"
+    },
+    {
+      "id": "imp",
+      "en": "Imp",
+      "zh": "小恶魔",
+      "edition": "tb",
+      "team": "demon",
+      "gist": "每晚（首夜除外）杀一人；若杀死自己，一名爪牙变成小恶魔。",
+      "firstNight": 0,
+      "otherNight": 40,
+      "stFirst": "",
+      "stOther": "让其指一名玩家并放“死亡”；若选了自己，换一名爪牙为小恶魔并唤醒告知。",
+      "reminders": [
+        "死亡"
+      ],
+      "remindersGlobal": [],
+      "setup": false,
+      "setupNote": "",
+      "outsiderMod": [
+        0
+      ],
+      "src": "https://wiki.bloodontheclocktower.com/Imp"
+    },
+    {
+      "id": "grandmother",
+      "en": "Grandmother",
+      "zh": "祖母",
+      "edition": "bmr",
+      "team": "townsfolk",
+      "gist": "开局得知一名善良玩家及其角色；恶魔杀死他时你也死。",
+      "firstNight": 59,
+      "otherNight": 73,
+      "stFirst": "指向孙子玩家并亮出其角色标记，在其旁放“孙子”。",
+      "stOther": "无需唤醒：若恶魔今晚杀死了孙子，祖母也一起死亡。",
+      "reminders": [
+        "孙子",
+        "死亡"
+      ],
+      "remindersGlobal": [],
+      "setup": false,
+      "setupNote": "",
+      "outsiderMod": [
+        0
+      ],
+      "src": "https://wiki.bloodontheclocktower.com/Grandmother"
+    },
+    {
+      "id": "sailor",
+      "en": "Sailor",
+      "zh": "水手",
+      "edition": "bmr",
+      "team": "townsfolk",
+      "gist": "每晚选一名存活玩家，你或他醉酒到黄昏；你自己不会死。",
+      "firstNight": 26,
+      "otherNight": 13,
+      "stFirst": "让其指一名存活玩家，决定两人中谁醉酒并放“醉酒”。",
+      "stOther": "让其指一名存活玩家，决定两人中谁醉酒并放“醉酒”。",
+      "reminders": [
+        "醉酒"
+      ],
+      "remindersGlobal": [],
+      "setup": false,
+      "setupNote": "",
+      "outsiderMod": [
+        0
+      ],
+      "src": "https://wiki.bloodontheclocktower.com/Sailor"
+    },
+    {
+      "id": "chambermaid",
+      "en": "Chambermaid",
+      "zh": "侍女",
+      "edition": "bmr",
+      "team": "townsfolk",
+      "gist": "每晚选两名其他存活玩家，得知其中几人今晚因能力醒来。",
+      "firstNight": 76,
+      "otherNight": 95,
+      "stFirst": "让其指两名非自己的存活玩家，比出其中今晚因能力醒来的人数。",
+      "stOther": "让其指两名非自己的存活玩家，比出其中今晚因能力醒来的人数。",
+      "reminders": [],
+      "remindersGlobal": [],
+      "setup": false,
+      "setupNote": "",
+      "outsiderMod": [
+        0
+      ],
+      "src": "https://wiki.bloodontheclocktower.com/Chambermaid"
+    },
+    {
+      "id": "exorcist",
+      "en": "Exorcist",
+      "zh": "驱魔人",
+      "edition": "bmr",
+      "team": "townsfolk",
+      "gist": "每晚（首夜除外）选一人（不能连选）；选中恶魔则恶魔得知你并当晚不行动。",
+      "firstNight": 0,
+      "otherNight": 36,
+      "stFirst": "",
+      "stOther": "让其指一名玩家放“被选择”；若是恶魔，唤醒恶魔告知驱魔人是谁，今晚恶魔不行动。",
+      "reminders": [
+        "被选择"
+      ],
+      "remindersGlobal": [],
+      "setup": false,
+      "setupNote": "",
+      "outsiderMod": [
+        0
+      ],
+      "src": "https://wiki.bloodontheclocktower.com/Exorcist"
+    },
+    {
+      "id": "innkeeper",
+      "en": "Innkeeper",
+      "zh": "旅店老板",
+      "edition": "bmr",
+      "team": "townsfolk",
+      "gist": "每晚（首夜除外）选两人当晚不会死，但其中一人醉酒到黄昏。",
+      "firstNight": 0,
+      "otherNight": 19,
+      "stFirst": "",
+      "stOther": "让其指两名玩家，各放“不会死亡”，并给其中一人放“醉酒”。",
+      "reminders": [
+        "不会死亡",
+        "不会死亡",
+        "醉酒"
+      ],
+      "remindersGlobal": [],
+      "setup": false,
+      "setupNote": "",
+      "outsiderMod": [
+        0
+      ],
+      "src": "https://wiki.bloodontheclocktower.com/Innkeeper"
+    },
+    {
+      "id": "gambler",
+      "en": "Gambler",
+      "zh": "赌徒",
+      "edition": "bmr",
+      "team": "townsfolk",
+      "gist": "每晚（首夜除外）猜一名玩家的角色，猜错你就死。",
+      "firstNight": 0,
+      "otherNight": 21,
+      "stFirst": "",
+      "stOther": "让其指一名玩家并在角色表上指一个角色；猜错则赌徒死亡。",
+      "reminders": [
+        "死亡"
+      ],
+      "remindersGlobal": [],
+      "setup": false,
+      "setupNote": "",
+      "outsiderMod": [
+        0
+      ],
+      "src": "https://wiki.bloodontheclocktower.com/Gambler"
+    },
+    {
+      "id": "gossip",
+      "en": "Gossip",
+      "zh": "造谣者",
+      "edition": "bmr",
+      "team": "townsfolk",
+      "gist": "白天可公开说一句话；若属实，说书人当晚处死一名玩家。",
+      "firstNight": 0,
+      "otherNight": 58,
+      "stFirst": "",
+      "stOther": "无需唤醒：若今天的声明为真，选一名玩家死亡。",
+      "reminders": [
+        "死亡"
+      ],
+      "remindersGlobal": [],
+      "setup": false,
+      "setupNote": "",
+      "outsiderMod": [
+        0
+      ],
+      "src": "https://wiki.bloodontheclocktower.com/Gossip"
+    },
+    {
+      "id": "courtier",
+      "en": "Courtier",
+      "zh": "侍臣",
+      "edition": "bmr",
+      "team": "townsfolk",
+      "gist": "每局一次，夜里点名一个角色，令其醉酒三天三夜。",
+      "firstNight": 35,
+      "otherNight": 18,
+      "stFirst": "若尚未使用，让其可在角色表上指一个角色；令该角色醉酒并放“醉酒3”。",
+      "stOther": "若尚未使用，让其可指一个角色；之后每晚把醉酒计数标记往下换一档。",
+      "reminders": [
+        "醉酒3",
+        "醉酒2",
+        "醉酒1",
+        "失去能力"
+      ],
+      "remindersGlobal": [],
+      "setup": false,
+      "setupNote": "",
+      "outsiderMod": [
+        0
+      ],
+      "src": "https://wiki.bloodontheclocktower.com/Courtier"
+    },
+    {
+      "id": "professor",
+      "en": "Professor",
+      "zh": "教授",
+      "edition": "bmr",
+      "team": "townsfolk",
+      "gist": "每局一次（首夜除外），选一名死者，若是镇民则复活。",
+      "firstNight": 0,
+      "otherNight": 65,
+      "stFirst": "",
+      "stOther": "若尚未使用，让其可指一名死亡玩家；是镇民则复活并放“复活”。",
+      "reminders": [
+        "复活",
+        "失去能力"
+      ],
+      "remindersGlobal": [],
+      "setup": false,
+      "setupNote": "",
+      "outsiderMod": [
+        0
+      ],
+      "src": "https://wiki.bloodontheclocktower.com/Professor"
+    },
+    {
+      "id": "minstrel",
+      "en": "Minstrel",
+      "zh": "吟游诗人",
+      "edition": "bmr",
+      "team": "townsfolk",
+      "gist": "有爪牙被处决死亡时，其余玩家都醉酒到次日黄昏。",
+      "firstNight": 0,
+      "otherNight": 0,
+      "stFirst": "",
+      "stOther": "",
+      "reminders": [
+        "全员醉酒"
+      ],
+      "remindersGlobal": [],
+      "setup": false,
+      "setupNote": "",
+      "outsiderMod": [
+        0
+      ],
+      "src": "https://wiki.bloodontheclocktower.com/Minstrel"
+    },
+    {
+      "id": "tealady",
+      "en": "Tea Lady",
+      "zh": "茶艺师",
+      "edition": "bmr",
+      "team": "townsfolk",
+      "gist": "两侧存活邻座都是善良时，他们不会死亡。",
+      "firstNight": 0,
+      "otherNight": 0,
+      "stFirst": "",
+      "stOther": "",
+      "reminders": [
+        "不会死亡",
+        "不会死亡"
+      ],
+      "remindersGlobal": [],
+      "setup": false,
+      "setupNote": "",
+      "outsiderMod": [
+        0
+      ],
+      "src": "https://wiki.bloodontheclocktower.com/Tea_Lady"
+    },
+    {
+      "id": "pacifist",
+      "en": "Pacifist",
+      "zh": "和平主义者",
+      "edition": "bmr",
+      "team": "townsfolk",
+      "gist": "善良玩家被处决时可能免于一死。",
+      "firstNight": 0,
+      "otherNight": 0,
+      "stFirst": "",
+      "stOther": "",
+      "reminders": [],
+      "remindersGlobal": [],
+      "setup": false,
+      "setupNote": "",
+      "outsiderMod": [
+        0
+      ],
+      "src": "https://wiki.bloodontheclocktower.com/Pacifist"
+    },
+    {
+      "id": "fool",
+      "en": "Fool",
+      "zh": "弄臣",
+      "edition": "bmr",
+      "team": "townsfolk",
+      "gist": "第一次死亡时不会真的死去。",
+      "firstNight": 0,
+      "otherNight": 0,
+      "stFirst": "",
+      "stOther": "",
+      "reminders": [
+        "失去能力"
+      ],
+      "remindersGlobal": [],
+      "setup": false,
+      "setupNote": "",
+      "outsiderMod": [
+        0
+      ],
+      "src": "https://wiki.bloodontheclocktower.com/Fool"
+    },
+    {
+      "id": "tinker",
+      "en": "Tinker",
+      "zh": "修补匠",
+      "edition": "bmr",
+      "team": "outsider",
+      "gist": "随时可能死亡，由说书人决定。",
+      "firstNight": 0,
+      "otherNight": 71,
+      "stFirst": "",
+      "stOther": "无需唤醒：如有需要，令修补匠死亡。",
+      "reminders": [
+        "死亡"
+      ],
+      "remindersGlobal": [],
+      "setup": false,
+      "setupNote": "",
+      "outsiderMod": [
+        0
+      ],
+      "src": "https://wiki.bloodontheclocktower.com/Tinker"
+    },
+    {
+      "id": "moonchild",
+      "en": "Moonchild",
+      "zh": "月之子",
+      "edition": "bmr",
+      "team": "outsider",
+      "gist": "得知自己死亡时公开指定一名存活玩家；若他善良，当晚死亡。",
+      "firstNight": 0,
+      "otherNight": 72,
+      "stFirst": "",
+      "stOther": "无需唤醒：若月之子所指的是善良玩家，该玩家今晚死亡。",
+      "reminders": [
+        "死亡"
+      ],
+      "remindersGlobal": [],
+      "setup": false,
+      "setupNote": "",
+      "outsiderMod": [
+        0
+      ],
+      "src": "https://wiki.bloodontheclocktower.com/Moonchild"
+    },
+    {
+      "id": "goon",
+      "en": "Goon",
+      "zh": "莽夫",
+      "edition": "bmr",
+      "team": "outsider",
+      "gist": "每晚第一个用能力选中你的玩家醉酒到黄昏，你转入他的阵营。",
+      "firstNight": 0,
+      "otherNight": 0,
+      "stFirst": "",
+      "stOther": "",
+      "reminders": [
+        "醉酒"
+      ],
+      "remindersGlobal": [],
+      "setup": false,
+      "setupNote": "",
+      "outsiderMod": [
+        0
+      ],
+      "src": "https://wiki.bloodontheclocktower.com/Goon"
+    },
+    {
+      "id": "lunatic",
+      "en": "Lunatic",
+      "zh": "疯子",
+      "edition": "bmr",
+      "team": "outsider",
+      "gist": "以为自己是恶魔但其实不是；真恶魔知道你是谁和你的夜间选择。",
+      "firstNight": 22,
+      "otherNight": 35,
+      "stFirst": "7人及以上：当作恶魔唤醒，指任意玩家充当爪牙并给3个伪装角色。",
+      "stOther": "先唤醒疯子，让其照恶魔方式选择目标并放“被选择”（不生效）。",
+      "reminders": [
+        "被选择",
+        "被选择",
+        "被选择"
+      ],
+      "remindersGlobal": [],
+      "setup": false,
+      "setupNote": "",
+      "outsiderMod": [
+        0
+      ],
+      "src": "https://wiki.bloodontheclocktower.com/Lunatic"
+    },
+    {
+      "id": "godfather",
+      "en": "Godfather",
+      "zh": "教父",
+      "edition": "bmr",
+      "team": "minion",
+      "gist": "开局得知在场有哪些外来者；当天有外来者死亡时，当晚可杀一人。",
+      "firstNight": 38,
+      "otherNight": 57,
+      "stFirst": "亮出所有在场外来者的角色标记。",
+      "stOther": "若今天有外来者死亡，让其指一名玩家，该玩家死亡。",
+      "reminders": [
+        "死于今日",
+        "死亡"
+      ],
+      "remindersGlobal": [],
+      "setup": true,
+      "setupNote": "-1 或 +1 外来者",
+      "outsiderMod": [
+        -1,
+        1
+      ],
+      "src": "https://wiki.bloodontheclocktower.com/Godfather"
+    },
+    {
+      "id": "devilsadvocate",
+      "en": "Devil's Advocate",
+      "zh": "魔鬼代言人",
+      "edition": "bmr",
+      "team": "minion",
+      "gist": "每晚选一名存活玩家（不能连选），其次日被处决也不会死。",
+      "firstNight": 40,
+      "otherNight": 26,
+      "stFirst": "让其指一名存活玩家，放“处决不死”。",
+      "stOther": "让其指一名存活玩家（不能与昨晚相同），放“处决不死”。",
+      "reminders": [
+        "处决不死"
+      ],
+      "remindersGlobal": [],
+      "setup": false,
+      "setupNote": "",
+      "outsiderMod": [
+        0
+      ],
+      "src": "https://wiki.bloodontheclocktower.com/Devil%27s_Advocate"
+    },
+    {
+      "id": "assassin",
+      "en": "Assassin",
+      "zh": "刺客",
+      "edition": "bmr",
+      "team": "minion",
+      "gist": "每局一次（首夜除外）夜里选一人，此人无论如何都会死。",
+      "firstNight": 0,
+      "otherNight": 56,
+      "stFirst": "",
+      "stOther": "若尚未使用，让其可指一名玩家；该玩家死亡，无视任何保护。",
+      "reminders": [
+        "死亡",
+        "失去能力"
+      ],
+      "remindersGlobal": [],
+      "setup": false,
+      "setupNote": "",
+      "outsiderMod": [
+        0
+      ],
+      "src": "https://wiki.bloodontheclocktower.com/Assassin"
+    },
+    {
+      "id": "mastermind",
+      "en": "Mastermind",
+      "zh": "主谋",
+      "edition": "bmr",
+      "team": "minion",
+      "gist": "恶魔被处决而结束游戏时再多玩一天，届时被处决者的阵营落败。",
+      "firstNight": 0,
+      "otherNight": 0,
+      "stFirst": "",
+      "stOther": "",
+      "reminders": [],
+      "remindersGlobal": [],
+      "setup": false,
+      "setupNote": "",
+      "outsiderMod": [
+        0
+      ],
+      "src": "https://wiki.bloodontheclocktower.com/Mastermind"
+    },
+    {
+      "id": "zombuul",
+      "en": "Zombuul",
+      "zh": "僵怖",
+      "edition": "bmr",
+      "team": "demon",
+      "gist": "当天无人死亡时，夜里可杀一人；第一次死亡只是假死。",
+      "firstNight": 0,
+      "otherNight": 41,
+      "stFirst": "",
+      "stOther": "若今天无人死亡，让其指一名玩家，该玩家死亡；否则不唤醒。",
+      "reminders": [
+        "死于今日",
+        "死亡"
+      ],
+      "remindersGlobal": [],
+      "setup": false,
+      "setupNote": "",
+      "outsiderMod": [
+        0
+      ],
+      "src": "https://wiki.bloodontheclocktower.com/Zombuul"
+    },
+    {
+      "id": "pukka",
+      "en": "Pukka",
+      "zh": "普卡",
+      "edition": "bmr",
+      "team": "demon",
+      "gist": "每晚让一人中毒；上一个中毒的人随后死亡并恢复健康。",
+      "firstNight": 47,
+      "otherNight": 42,
+      "stFirst": "让其指一名玩家，放“中毒”。",
+      "stOther": "让其指一名玩家放“中毒”；上一位中毒者死亡并解除中毒。",
+      "reminders": [
+        "中毒",
+        "中毒",
+        "死亡"
+      ],
+      "remindersGlobal": [],
+      "setup": false,
+      "setupNote": "",
+      "outsiderMod": [
+        0
+      ],
+      "src": "https://wiki.bloodontheclocktower.com/Pukka"
+    },
+    {
+      "id": "shabaloth",
+      "en": "Shabaloth",
+      "zh": "沙巴洛斯",
+      "edition": "bmr",
+      "team": "demon",
+      "gist": "每晚（首夜除外）杀两人；昨晚选过的死者有可能复活。",
+      "firstNight": 0,
+      "otherNight": 43,
+      "stFirst": "",
+      "stOther": "让其指两名玩家使其死亡；可视情况让昨晚被选的一名死者复活。",
+      "reminders": [
+        "死亡",
+        "死亡",
+        "复活"
+      ],
+      "remindersGlobal": [],
+      "setup": false,
+      "setupNote": "",
+      "outsiderMod": [
+        0
+      ],
+      "src": "https://wiki.bloodontheclocktower.com/Shabaloth"
+    },
+    {
+      "id": "po",
+      "en": "Po",
+      "zh": "珀",
+      "edition": "bmr",
+      "team": "demon",
+      "gist": "每晚（首夜除外）可选一人杀死；上次放弃则今晚杀三人。",
+      "firstNight": 0,
+      "otherNight": 44,
+      "stFirst": "",
+      "stOther": "让其指一名玩家或放弃；若上次放弃，改为指三名玩家。",
+      "reminders": [
+        "死亡",
+        "死亡",
+        "死亡",
+        "攻击三次"
+      ],
+      "remindersGlobal": [],
+      "setup": false,
+      "setupNote": "",
+      "outsiderMod": [
+        0
+      ],
+      "src": "https://wiki.bloodontheclocktower.com/Po"
+    },
+    {
+      "id": "clockmaker",
+      "en": "Clockmaker",
+      "zh": "钟表匠",
+      "edition": "snv",
+      "team": "townsfolk",
+      "gist": "开局得知恶魔与离他最近的爪牙之间隔几步。",
+      "firstNight": 60,
+      "otherNight": 0,
+      "stFirst": "用手指比出恶魔到最近爪牙的座位步数。",
+      "stOther": "",
+      "reminders": [],
+      "remindersGlobal": [],
+      "setup": false,
+      "setupNote": "",
+      "outsiderMod": [
+        0
+      ],
+      "src": "https://wiki.bloodontheclocktower.com/Clockmaker"
+    },
+    {
+      "id": "dreamer",
+      "en": "Dreamer",
+      "zh": "筑梦师",
+      "edition": "snv",
+      "team": "townsfolk",
+      "gist": "每晚选一名玩家，得知一善一恶两个角色，其中一个是他的真身。",
+      "firstNight": 61,
+      "otherNight": 79,
+      "stFirst": "让其指一名玩家，亮出一个善良和一个邪恶角色标记，其中一个正确。",
+      "stOther": "让其指一名玩家，亮出一个善良和一个邪恶角色标记，其中一个正确。",
+      "reminders": [],
+      "remindersGlobal": [],
+      "setup": false,
+      "setupNote": "",
+      "outsiderMod": [
+        0
+      ],
+      "src": "https://wiki.bloodontheclocktower.com/Dreamer"
+    },
+    {
+      "id": "snakecharmer",
+      "en": "Snake Charmer",
+      "zh": "舞蛇人",
+      "edition": "snv",
+      "team": "townsfolk",
+      "gist": "每晚选一名存活玩家；选中恶魔则两人互换角色与阵营，原恶魔中毒。",
+      "firstNight": 37,
+      "otherNight": 23,
+      "stFirst": "让其指一名存活玩家；若是恶魔，交换两人角色和阵营并分别告知，新舞蛇人放“中毒”。",
+      "stOther": "让其指一名存活玩家；若是恶魔，交换两人角色和阵营并分别告知，新舞蛇人放“中毒”。",
+      "reminders": [
+        "中毒"
+      ],
+      "remindersGlobal": [],
+      "setup": false,
+      "setupNote": "",
+      "outsiderMod": [
+        0
+      ],
+      "src": "https://wiki.bloodontheclocktower.com/Snake_Charmer"
+    },
+    {
+      "id": "mathematician",
+      "en": "Mathematician",
+      "zh": "数学家",
+      "edition": "snv",
+      "team": "townsfolk",
+      "gist": "每晚得知自黎明起有几人的能力因他人而出现异常。",
+      "firstNight": 77,
+      "otherNight": 96,
+      "stFirst": "用手指比出带“未正常生效”标记的玩家数，然后清除标记。",
+      "stOther": "用手指比出带“未正常生效”标记的玩家数，然后清除标记。",
+      "reminders": [
+        "未正常生效",
+        "未正常生效",
+        "未正常生效",
+        "未正常生效",
+        "未正常生效"
+      ],
+      "remindersGlobal": [],
+      "setup": false,
+      "setupNote": "",
+      "outsiderMod": [
+        0
+      ],
+      "src": "https://wiki.bloodontheclocktower.com/Mathematician"
+    },
+    {
+      "id": "flowergirl",
+      "en": "Flowergirl",
+      "zh": "卖花女孩",
+      "edition": "snv",
+      "team": "townsfolk",
+      "gist": "每晚（首夜除外）得知今天恶魔有没有投过票。",
+      "firstNight": 0,
+      "otherNight": 80,
+      "stFirst": "",
+      "stOther": "恶魔今天投过票就点头，否则摇头。",
+      "reminders": [
+        "恶魔已投票",
+        "恶魔未投票"
+      ],
+      "remindersGlobal": [],
+      "setup": false,
+      "setupNote": "",
+      "outsiderMod": [
+        0
+      ],
+      "src": "https://wiki.bloodontheclocktower.com/Flowergirl"
+    },
+    {
+      "id": "towncrier",
+      "en": "Town Crier",
+      "zh": "城镇公告员",
+      "edition": "snv",
+      "team": "townsfolk",
+      "gist": "每晚（首夜除外）得知今天是否有爪牙提名过别人。",
+      "firstNight": 0,
+      "otherNight": 81,
+      "stFirst": "",
+      "stOther": "今天有爪牙提名过就点头，否则摇头。",
+      "reminders": [
+        "爪牙未提名",
+        "爪牙已提名"
+      ],
+      "remindersGlobal": [],
+      "setup": false,
+      "setupNote": "",
+      "outsiderMod": [
+        0
+      ],
+      "src": "https://wiki.bloodontheclocktower.com/Town_Crier"
+    },
+    {
+      "id": "oracle",
+      "en": "Oracle",
+      "zh": "神谕者",
+      "edition": "snv",
+      "team": "townsfolk",
+      "gist": "每晚（首夜除外）得知死亡玩家中有几名邪恶。",
+      "firstNight": 0,
+      "otherNight": 82,
+      "stFirst": "",
+      "stOther": "用手指比出死亡玩家中的邪恶人数。",
+      "reminders": [],
+      "remindersGlobal": [],
+      "setup": false,
+      "setupNote": "",
+      "outsiderMod": [
+        0
+      ],
+      "src": "https://wiki.bloodontheclocktower.com/Oracle"
+    },
+    {
+      "id": "savant",
+      "en": "Savant",
+      "zh": "博学者",
+      "edition": "snv",
+      "team": "townsfolk",
+      "gist": "每天可私下找说书人拿两条信息，一真一假。",
+      "firstNight": 0,
+      "otherNight": 0,
+      "stFirst": "",
+      "stOther": "",
+      "reminders": [],
+      "remindersGlobal": [],
+      "setup": false,
+      "setupNote": "",
+      "outsiderMod": [
+        0
+      ],
+      "src": "https://wiki.bloodontheclocktower.com/Savant"
+    },
+    {
+      "id": "seamstress",
+      "en": "Seamstress",
+      "zh": "女裁缝",
+      "edition": "snv",
+      "team": "townsfolk",
+      "gist": "每局一次，夜里选两名其他玩家，得知他们是否同一阵营。",
+      "firstNight": 62,
+      "otherNight": 83,
+      "stFirst": "若尚未使用，让其可指两名非自己的玩家；同阵营点头，否则摇头。",
+      "stOther": "若尚未使用，让其可指两名非自己的玩家；同阵营点头，否则摇头。",
+      "reminders": [
+        "失去能力"
+      ],
+      "remindersGlobal": [],
+      "setup": false,
+      "setupNote": "",
+      "outsiderMod": [
+        0
+      ],
+      "src": "https://wiki.bloodontheclocktower.com/Seamstress"
+    },
+    {
+      "id": "philosopher",
+      "en": "Philosopher",
+      "zh": "哲学家",
+      "edition": "snv",
+      "team": "townsfolk",
+      "gist": "每局一次，夜里选一个善良角色获得其能力；该角色若在场则醉酒。",
+      "firstNight": 14,
+      "otherNight": 11,
+      "stFirst": "若尚未使用，让其可指一个善良角色；赋予该能力，若该角色在场则令其醉酒。",
+      "stOther": "若尚未使用，让其可指一个善良角色；赋予该能力，若该角色在场则令其醉酒。",
+      "reminders": [
+        "醉酒"
+      ],
+      "remindersGlobal": [
+        "是哲学家"
+      ],
+      "setup": false,
+      "setupNote": "",
+      "outsiderMod": [
+        0
+      ],
+      "src": "https://wiki.bloodontheclocktower.com/Philosopher"
+    },
+    {
+      "id": "artist",
+      "en": "Artist",
+      "zh": "艺术家",
+      "edition": "snv",
+      "team": "townsfolk",
+      "gist": "每局一次，白天私下问说书人一个是非题。",
+      "firstNight": 0,
+      "otherNight": 0,
+      "stFirst": "",
+      "stOther": "",
+      "reminders": [
+        "失去能力"
+      ],
+      "remindersGlobal": [],
+      "setup": false,
+      "setupNote": "",
+      "outsiderMod": [
+        0
+      ],
+      "src": "https://wiki.bloodontheclocktower.com/Artist"
+    },
+    {
+      "id": "juggler",
+      "en": "Juggler",
+      "zh": "杂耍艺人",
+      "edition": "snv",
+      "team": "townsfolk",
+      "gist": "首个白天公开猜至多五名玩家的角色，当晚得知猜中几个。",
+      "firstNight": 0,
+      "otherNight": 84,
+      "stFirst": "",
+      "stOther": "仅在其首个白天之后的夜晚：用手指比出猜对的数量。",
+      "reminders": [
+        "猜测正确",
+        "猜测正确",
+        "猜测正确",
+        "猜测正确",
+        "猜测正确"
+      ],
+      "remindersGlobal": [],
+      "setup": false,
+      "setupNote": "",
+      "outsiderMod": [
+        0
+      ],
+      "src": "https://wiki.bloodontheclocktower.com/Juggler"
+    },
+    {
+      "id": "sage",
+      "en": "Sage",
+      "zh": "贤者",
+      "edition": "snv",
+      "team": "townsfolk",
+      "gist": "若被恶魔杀死，得知恶魔是两名玩家之一。",
+      "firstNight": 0,
+      "otherNight": 63,
+      "stFirst": "",
+      "stOther": "若恶魔今晚杀死了贤者：唤醒并点出两名玩家，恶魔在其中。",
+      "reminders": [],
+      "remindersGlobal": [],
+      "setup": false,
+      "setupNote": "",
+      "outsiderMod": [
+        0
+      ],
+      "src": "https://wiki.bloodontheclocktower.com/Sage"
+    },
+    {
+      "id": "mutant",
+      "en": "Mutant",
+      "zh": "畸形秀演员",
+      "edition": "snv",
+      "team": "outsider",
+      "gist": "须避免让人相信自己是外来者（“疯狂”规则），否则可能被处决。",
+      "firstNight": 0,
+      "otherNight": 0,
+      "stFirst": "",
+      "stOther": "",
+      "reminders": [],
+      "remindersGlobal": [],
+      "setup": false,
+      "setupNote": "",
+      "outsiderMod": [
+        0
+      ],
+      "src": "https://wiki.bloodontheclocktower.com/Mutant"
+    },
+    {
+      "id": "sweetheart",
+      "en": "Sweetheart",
+      "zh": "心上人",
+      "edition": "snv",
+      "team": "outsider",
+      "gist": "死后会令一名玩家从此陷入醉酒。",
+      "firstNight": 0,
+      "otherNight": 61,
+      "stFirst": "",
+      "stOther": "无需唤醒：若其已死亡且尚未触发，选一名玩家永久醉酒并放“醉酒”。",
+      "reminders": [
+        "醉酒"
+      ],
+      "remindersGlobal": [],
+      "setup": false,
+      "setupNote": "",
+      "outsiderMod": [
+        0
+      ],
+      "src": "https://wiki.bloodontheclocktower.com/Sweetheart"
+    },
+    {
+      "id": "barber",
+      "en": "Barber",
+      "zh": "理发师",
+      "edition": "snv",
+      "team": "outsider",
+      "gist": "你在当天或当晚死亡时，恶魔可交换两名玩家（非恶魔）的角色。",
+      "firstNight": 0,
+      "otherNight": 60,
+      "stFirst": "",
+      "stOther": "若其今天或今晚死亡：唤醒恶魔，让其可指两名玩家互换角色，再分别告知二人。",
+      "reminders": [
+        "今晚理发"
+      ],
+      "remindersGlobal": [],
+      "setup": false,
+      "setupNote": "",
+      "outsiderMod": [
+        0
+      ],
+      "src": "https://wiki.bloodontheclocktower.com/Barber"
+    },
+    {
+      "id": "klutz",
+      "en": "Klutz",
+      "zh": "呆瓜",
+      "edition": "snv",
+      "team": "outsider",
+      "gist": "得知自己死亡时须公开指定一名存活玩家；若他邪恶，善良落败。",
+      "firstNight": 0,
+      "otherNight": 0,
+      "stFirst": "",
+      "stOther": "",
+      "reminders": [],
+      "remindersGlobal": [],
+      "setup": false,
+      "setupNote": "",
+      "outsiderMod": [
+        0
+      ],
+      "src": "https://wiki.bloodontheclocktower.com/Klutz"
+    },
+    {
+      "id": "eviltwin",
+      "en": "Evil Twin",
+      "zh": "镜像双子",
+      "edition": "snv",
+      "team": "minion",
+      "gist": "你与一名对立阵营玩家互知身份；善良双子被处决则邪恶胜，二人都活着善良无法获胜。",
+      "firstNight": 41,
+      "otherNight": 0,
+      "stFirst": "同时唤醒双子互相确认，各自亮出对方的角色标记。",
+      "stOther": "",
+      "reminders": [
+        "对立双子"
+      ],
+      "remindersGlobal": [],
+      "setup": false,
+      "setupNote": "",
+      "outsiderMod": [
+        0
+      ],
+      "src": "https://wiki.bloodontheclocktower.com/Evil_Twin"
+    },
+    {
+      "id": "witch",
+      "en": "Witch",
+      "zh": "女巫",
+      "edition": "snv",
+      "team": "minion",
+      "gist": "每晚诅咒一人，他次日发起提名就会死；仅剩三人存活时失去能力。",
+      "firstNight": 42,
+      "otherNight": 27,
+      "stFirst": "让其指一名玩家，放“被诅咒”。",
+      "stOther": "让其指一名玩家，放“被诅咒”。",
+      "reminders": [
+        "被诅咒"
+      ],
+      "remindersGlobal": [],
+      "setup": false,
+      "setupNote": "",
+      "outsiderMod": [
+        0
+      ],
+      "src": "https://wiki.bloodontheclocktower.com/Witch"
+    },
+    {
+      "id": "cerenovus",
+      "en": "Cerenovus",
+      "zh": "洗脑师",
+      "edition": "snv",
+      "team": "minion",
+      "gist": "每晚选一人和一个善良角色，令他次日“疯狂”扮演该角色，否则可能被处决。",
+      "firstNight": 43,
+      "otherNight": 28,
+      "stFirst": "让其指一名玩家和一个善良角色；再唤醒该玩家告知他须“疯狂”成该角色。",
+      "stOther": "让其指一名玩家和一个善良角色；再唤醒该玩家告知他须“疯狂”成该角色。",
+      "reminders": [
+        "疯狂"
+      ],
+      "remindersGlobal": [],
+      "setup": false,
+      "setupNote": "",
+      "outsiderMod": [
+        0
+      ],
+      "src": "https://wiki.bloodontheclocktower.com/Cerenovus"
+    },
+    {
+      "id": "pithag",
+      "en": "Pit-Hag",
+      "zh": "麻脸巫婆",
+      "edition": "snv",
+      "team": "minion",
+      "gist": "每晚（首夜除外）把一人变成不在场的角色；造出恶魔时当晚谁死由说书人定。",
+      "firstNight": 0,
+      "otherNight": 29,
+      "stFirst": "",
+      "stOther": "让其指一名玩家和一个角色；若该角色不在场，唤醒该玩家告知其新角色。",
+      "reminders": [],
+      "remindersGlobal": [],
+      "setup": false,
+      "setupNote": "",
+      "outsiderMod": [
+        0
+      ],
+      "src": "https://wiki.bloodontheclocktower.com/Pit-Hag"
+    },
+    {
+      "id": "fanggu",
+      "en": "Fang Gu",
+      "zh": "方古",
+      "edition": "snv",
+      "team": "demon",
+      "gist": "每晚（首夜除外）杀一人；首次杀到外来者时，他变成邪恶方古而你死亡。",
+      "firstNight": 0,
+      "otherNight": 45,
+      "stFirst": "",
+      "stOther": "让其指一名玩家；若是首次选中外来者，原方古死亡，该玩家转为邪恶方古并被告知。",
+      "reminders": [
+        "死亡",
+        "限一次"
+      ],
+      "remindersGlobal": [],
+      "setup": true,
+      "setupNote": "+1 外来者",
+      "outsiderMod": [
+        1
+      ],
+      "src": "https://wiki.bloodontheclocktower.com/Fang_Gu"
+    },
+    {
+      "id": "vigormortis",
+      "en": "Vigormortis",
+      "zh": "亡骨魔",
+      "edition": "snv",
+      "team": "demon",
+      "gist": "每晚（首夜除外）杀一人；被你杀死的爪牙保留能力，并毒害一名镇民邻座。",
+      "firstNight": 0,
+      "otherNight": 49,
+      "stFirst": "",
+      "stOther": "让其指一名玩家使其死亡；若是爪牙，放“保留能力”并给其一名镇民邻座放“中毒”。",
+      "reminders": [
+        "死亡",
+        "保留能力",
+        "保留能力",
+        "保留能力",
+        "中毒",
+        "中毒",
+        "中毒"
+      ],
+      "remindersGlobal": [],
+      "setup": true,
+      "setupNote": "-1 外来者",
+      "outsiderMod": [
+        -1
+      ],
+      "src": "https://wiki.bloodontheclocktower.com/Vigormortis"
+    },
+    {
+      "id": "nodashii",
+      "en": "No Dashii",
+      "zh": "诺-达鲺",
+      "edition": "snv",
+      "team": "demon",
+      "gist": "每晚（首夜除外）杀一人；你两侧最近的镇民邻座中毒。",
+      "firstNight": 0,
+      "otherNight": 46,
+      "stFirst": "",
+      "stOther": "让其指一名玩家，该玩家死亡。",
+      "reminders": [
+        "死亡",
+        "中毒",
+        "中毒"
+      ],
+      "remindersGlobal": [],
+      "setup": false,
+      "setupNote": "",
+      "outsiderMod": [
+        0
+      ],
+      "src": "https://wiki.bloodontheclocktower.com/No_Dashii"
+    },
+    {
+      "id": "vortox",
+      "en": "Vortox",
+      "zh": "涡流",
+      "edition": "snv",
+      "team": "demon",
+      "gist": "每晚（首夜除外）杀一人；镇民所得信息全为假；某天无人被处决则邪恶胜。",
+      "firstNight": 0,
+      "otherNight": 47,
+      "stFirst": "",
+      "stOther": "让其指一名玩家，该玩家死亡。",
+      "reminders": [
+        "死亡"
+      ],
+      "remindersGlobal": [],
+      "setup": false,
+      "setupNote": "",
+      "outsiderMod": [
+        0
+      ],
+      "src": "https://wiki.bloodontheclocktower.com/Vortox"
+    }
+  ]
+}

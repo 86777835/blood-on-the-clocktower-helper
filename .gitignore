@@ -1,0 +1,7 @@
+node_modules
+.wrangler/
+shots/
+.DS_Store
+# cover candidates not used by the site (third-party photos)
+docs/cover/tpi_shop_toprow.jpg
+docs/cover/bgg_en_box_front.jpg
