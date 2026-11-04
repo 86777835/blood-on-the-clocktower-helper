@@ -2,6 +2,8 @@
 // The Storyteller's phone gets the whole state; every other phone gets publicView(), built field by field.
 import { EDITIONS, CHARS, STEPS, COUNTS, TEAM_ZH } from './data.js';
 
+import { parseScript, charactersOf, publicScript } from './custom.js';
+
 const clone = o => JSON.parse(JSON.stringify(o));
 const cleanText = (v, max) => String(v ?? '').replace(/[\u0000-\u001f]/g, ' ').trim().slice(0, max);
 const isInt = (v, lo, hi) => Number.isInteger(v) && v >= lo && v <= hi;
@@ -26,9 +28,9 @@ export function initialState() {
 }
 
 /* ---------- helpers ---------- */
-export const edChars = ed => EDITIONS[ed]?.chars || [];
-export const teamOf = id => CHARS[id]?.team;
-export const isGood = id => ['townsfolk', 'outsider'].includes(teamOf(id));
+export const edChars = (ed, S) => ed === 'custom' ? S?.script?.chars || [] : EDITIONS[ed]?.chars || [];
+export const teamOf = (id, S) => charactersOf(S)[id]?.team;
+export const isGood = (id, S) => ['townsfolk', 'outsider'].includes(teamOf(id, S));
 const alive = S => S.seats.filter(s => !s.dead).length;
 export const phaseName = ph => !ph ? '' : ph.k === 'night' ? (ph.n === 1 ? '首夜' : `第 ${ph.n} 夜`) : `第 ${ph.n} 天`;
 const at = S => (S.ph.k === 'night' ? 'N' : 'D') + S.ph.n;
@@ -36,11 +38,12 @@ const at = S => (S.ph.k === 'night' ? 'N' : 'D') + S.ph.n;
 export const BELIEVE = { drunk: ['townsfolk'], lunatic: ['demon'], marionette: ['townsfolk', 'outsider'] };
 
 // Setup counts for n players: { townsfolk, outsider, minion, demon }, with the Outsider changes the bag allows.
-export function setupCheck(ed, n, bag) {
+export function setupCheck(ed, n, bag, S) {
+  const CHARS = charactersOf(S);
   const base = COUNTS[n];
   if (!base) return null;
   const have = { townsfolk: 0, outsider: 0, minion: 0, demon: 0 };
-  for (const id of bag) if (have[teamOf(id)] !== undefined) have[teamOf(id)]++;
+  for (const id of bag) if (have[teamOf(id, S)] !== undefined) have[teamOf(id, S)]++;
   // Every Outsider change the bag allows (e.g. Godfather −1 or +1, Baron +2); they add up.
   let mods = [0];
   for (const id of bag) { const om = CHARS[id]?.om || [0]; if (om.some(x => x)) mods = mods.flatMap(m => om.map(x => m + x)); }
@@ -49,6 +52,22 @@ export function setupCheck(ed, n, bag) {
     .filter(o => o.townsfolk >= 0 && o.outsider >= 0);
   const ok = bag.length === n && options.some(o => Object.keys(o).every(k => o[k] === have[k]));
   return { base: { townsfolk: base[0], outsider: base[1], minion: base[2], demon: base[3] }, options, have, ok };
+}
+
+// Can this whole script supply a legal bag? Modifier characters are optional until selected.
+export function poolCheck(S, n) {
+  const chars = edChars(S.ed, S), dict = charactersOf(S);
+  const modifiers = chars.filter(id => dict[id].om?.some(x => x));
+  const subsets = modifiers.reduce((xs, id) => [...xs, ...xs.map(x => [...x, id])], [[]]);
+  const options = [];
+  for (const included of subsets) {
+    const available = chars.filter(id => !modifiers.includes(id) || included.includes(id));
+    const check = setupCheck(S.ed, n, included, S);
+    for (const want of check?.options || []) {
+      if (Object.keys(want).every(t => want[t] >= check.have[t] && want[t] <= available.filter(id => dict[id].team === t).length)) options.push(want);
+    }
+  }
+  return { ok: options.length > 0, options };
 }
 
 // Votes needed to put someone on the block: half the living players, rounded up.
@@ -65,8 +84,9 @@ export function onBlock(S, d = S.ph?.n) {
 // Dead players stay in the list (some abilities work on the night they die) but are flagged.
 export function nightList(S) {
   if (!S.ph || S.ph.k !== 'night') return [];
+  const CHARS = charactersOf(S), steps = S.ed === 'custom' ? S.script.steps : STEPS;
   const first = S.ph.n === 1, key = first ? 'fn' : 'on', out = [];
-  for (const [id, st] of Object.entries(STEPS)) {
+  for (const [id, st] of Object.entries(steps)) {
     if (!st[key]) continue;
     if ((id === 'minioninfo' || id === 'demoninfo') && (!first || S.n < 7)) continue;   // 5–6 players: no evil info
     out.push({ k: id, order: st[key], step: id, zh: st.zh, tip: first ? st.stF : st.stO });
@@ -80,6 +100,8 @@ export function nightList(S) {
     if (s.role) add(s.role, false);
     if (s.bel && s.bel !== s.role) add(s.bel, true);
   });
+  const order = S.script?.[first ? 'firstNight' : 'otherNight'];
+  if (order) for (const x of out) x.order = order.indexOf(x.char || x.step) + 1;
   return out.sort((a, b) => a.order - b.order || (a.seat ?? -1) - (b.seat ?? -1));
 }
 
@@ -90,16 +112,24 @@ function syncPub(S) { S.pub = { dead: S.seats.map(s => s.dead), ghost: S.seats.m
 export function reduce(s, a) {
   if (!a || typeof a !== 'object') return null;
   const S = clone(s);
+  const CHARS = charactersOf(S);
   const done = () => { if (S.ph?.k === 'day' || S.stage !== 'play') syncPub(S); S.v = s.v + 1; return S; };
   const setup = S.stage === 'setup', play = S.stage === 'play';
   const seatOk = i => isInt(i, 0, S.seats.length - 1);
-  const charOk = id => typeof id === 'string' && Object.hasOwn(CHARS, id) && edChars(S.ed).includes(id);
+  const charOk = id => typeof id === 'string' && Object.hasOwn(CHARS, id) && edChars(S.ed, S).includes(id);
 
   switch (a.t) {
     case 'setup': {   // edition and player count; changing either clears the bag and the characters
-      if (!setup || !Object.hasOwn(EDITIONS, a.ed) || !isInt(a.n, MIN_PLAYERS, MAX_PLAYERS)) return null;
+      if (!setup || !isInt(a.n, MIN_PLAYERS, MAX_PLAYERS) || Object.keys(a).some(k => !['t', 'ed', 'n', 'script'].includes(k))) return null;
+      if (a.ed === 'custom') {
+        if (a.script !== undefined) { try { S.script = parseScript(a.script); } catch { return null; } }
+        else if (S.ed !== 'custom' || !S.script) return null;
+      } else {
+        if (!Object.hasOwn(EDITIONS, a.ed) || a.script !== undefined || a.characters !== undefined) return null;
+        delete S.script;
+      }
       const names = S.seats.map(x => x.name);
-      if (a.ed !== S.ed) { S.bag = []; S.bluffs = []; }
+      if (a.ed !== S.ed || a.script !== undefined) { S.bag = []; S.bluffs = []; }
       S.ed = a.ed; S.n = a.n;
       if (S.bag.length > a.n) S.bag = S.bag.slice(0, a.n);
       S.seats = Array.from({ length: a.n }, (_, i) => newSeat(names[i] || ''));
@@ -130,14 +160,14 @@ export function reduce(s, a) {
       }
       if (a.bel !== undefined) {
         if (a.bel === null) st.bel = null;
-        else if (!BELIEVE[st.role] || !charOk(a.bel) || !BELIEVE[st.role].includes(teamOf(a.bel)) || a.bel === st.role) return null;
+        else if (!BELIEVE[st.role] || !charOk(a.bel) || !BELIEVE[st.role].includes(teamOf(a.bel, S)) || a.bel === st.role) return null;
         else st.bel = a.bel;
       }
       return done();
     }
 
     case 'bluffs':
-      if (S.stage === 'over' || !S.ed || !Array.isArray(a.ids) || a.ids.length > 3 || !a.ids.every(id => charOk(id) && isGood(id)) || new Set(a.ids).size !== a.ids.length) return null;
+      if (S.stage === 'over' || !S.ed || !Array.isArray(a.ids) || a.ids.length > 3 || !a.ids.every(id => charOk(id) && isGood(id, S)) || new Set(a.ids).size !== a.ids.length) return null;
       S.bluffs = a.ids.slice();
       return done();
 
@@ -152,12 +182,12 @@ export function reduce(s, a) {
     }
 
     case 'step':   // tick off a step of tonight's list
-      if (!play || S.ph.k !== 'night' || typeof a.k !== 'string' || a.k.length > 40 || typeof a.on !== 'boolean') return null;
+      if (!play || S.ph.k !== 'night' || typeof a.k !== 'string' || a.k.length > 64 || typeof a.on !== 'boolean') return null;
       if (a.on) S.done[a.k] = true; else delete S.done[a.k];
       return done();
 
     case 'log': {   // what the Storyteller did at a step (one line per step and phase; empty removes it)
-      if (!play || typeof a.k !== 'string' || a.k.length > 40) return null;
+      if (!play || typeof a.k !== 'string' || a.k.length > 64) return null;
       const x = cleanText(a.x, 120), here = at(S);
       if (a.k === 'note') { if (!x) return null; S.log.push({ at: here, k: 'note', x }); }
       else {
@@ -186,7 +216,7 @@ export function reduce(s, a) {
 
     case 'mark': {   // a reminder token on a player
       if (!play || !seatOk(a.i) || !charOk(a.c) || typeof a.on !== 'boolean') return null;
-      const t = cleanText(a.x, 12), m = S.seats[a.i].marks;
+      const t = S.ed === 'custom' ? (typeof a.x === 'string' && a.x.length <= 30 ? a.x : '') : cleanText(a.x, 12), m = S.seats[a.i].marks;
       if (!t || !(CHARS[a.c].rem || []).includes(t)) return null;
       const k = m.findIndex(x => x.c === a.c && x.t === t);
       if (a.on && k < 0) { if (m.length >= 12) return null; m.push({ c: a.c, t }); }
@@ -238,8 +268,9 @@ export function reduce(s, a) {
 
     case 'reset': {   // a new game in the same room: keeps the edition, player count and names
       if (S.stage !== 'over') return null;
-      const keep = { ed: S.ed, n: S.n, names: S.seats.map(x => x.name) };
+      const keep = { script: S.script, ed: S.ed, n: S.n, names: S.seats.map(x => x.name) };
       Object.assign(S, initialState(), { v: S.v, ed: keep.ed, n: keep.n, seats: keep.names.map(newSeat) });
+      if (keep.script) S.script = keep.script;
       return done();
     }
   }
@@ -255,6 +286,7 @@ export function nameAction(a) { return a && a.t === 'seat' && Object.keys(a).eve
 // and deaths only as the town square showed them at the end of the last day.
 export function publicView(s) {
   const v = { stage: s.stage, ed: s.ed, n: s.n, ph: s.ph ? { k: s.ph.k, n: s.ph.n } : null };
+  if (s.ed === 'custom' && s.script) v.script = publicScript(s.script);
   const pub = s.pub || { dead: s.seats.map(() => false), ghost: s.seats.map(() => true) };
   v.seats = s.seats.map((x, i) => ({ name: x.name, dead: !!pub.dead[i], ghost: pub.ghost[i] !== false }));
   v.noms = s.noms.map(x => ({ d: x.d, by: x.by, on: x.on, votes: x.votes.slice(), n: x.n, need: x.need }));
@@ -271,14 +303,16 @@ export function publicView(s) {
 // The record kept in the room's archive.
 export function gameRecord(S) {
   if (S.stage !== 'over' || !S.gid) return null;
-  return { gid: S.gid, ed: S.ed, n: S.n, result: S.result, why: S.why, days: S.ph?.n || 0,
+  return { ...(S.script ? { script: clone(S.script) } : {}), gid: S.gid, ed: S.ed, n: S.n, result: S.result, why: S.why, days: S.ph?.n || 0,
     seats: S.seats.map(x => ({ name: x.name, role: x.role, bel: x.bel, dead: x.dead })), bluffs: S.bluffs.slice(),
     noms: S.noms.length, execs: S.execs.map(x => ({ d: x.d, seat: x.seat, died: x.died })),
-    log: S.log.map(e => `${e.at.replace(/^N1$/, '首夜').replace(/^N(\d+)/, '第$1夜').replace(/^D(\d+)/, '第$1天')} ${stepLabel(e.k)}${e.x}`) };
+    log: S.log.map(e => `${e.at.replace(/^N1$/, '首夜').replace(/^N(\d+)/, '第$1夜').replace(/^D(\d+)/, '第$1天')} ${stepLabel(e.k, S)}${e.x}`) };
 }
-export function stepLabel(k) {
-  if (STEPS[k]) return `[${STEPS[k].zh}] `;
-  const m = /^([a-z_]+)@(\d+)$/.exec(k);
+export function stepLabel(k, S) {
+  const CHARS = charactersOf(S);
+  const steps = S?.ed === 'custom' ? S.script.steps : STEPS;
+  if (steps[k]) return `[${steps[k].zh}] `;
+  const m = /^([a-z0-9_]+)@(\d+)$/.exec(k);
   return m && CHARS[m[1]] ? `[${CHARS[m[1]].zh}·${+m[2] + 1}号] ` : '';
 }
 

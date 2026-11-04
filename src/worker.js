@@ -1,3 +1,4 @@
+import { MAX_SCRIPT_BYTES } from '../public/custom.js';
 import { DurableObject } from 'cloudflare:workers';
 import { initialState, reduce, publicView, gameRecord, nameAction } from '../public/logic.js';
 import { EDITIONS, CHARS, TEAM_ZH } from '../public/data.js';
@@ -254,7 +255,8 @@ export class Room extends DurableObject {
   }
 
   async webSocketMessage(ws, msg) {
-    if (!this.s || typeof msg !== 'string' || msg.length > 6000) return;
+    if (!this.s || typeof msg !== 'string') return;
+    if (new TextEncoder().encode(msg).length > MAX_SCRIPT_BYTES + 1024) { ws.send(JSON.stringify({ type: 'error', error: '剧本请求超过 128 KiB 上限' })); return; }
     let m; try { m = JSON.parse(msg); } catch { return; }
     const me = this.att(ws);
     if (m.auth !== undefined) {

@@ -634,3 +634,17 @@ img.ccc{display:block;width:110px;height:auto;margin:8px auto 0;opacity:.85}
 .pkc .cb.ic{width:30px;height:30px}
 .grim .cb.ic,.bluffs .cb.ic{width:32px;height:32px}
 .ns-b > b .cb.ic{width:30px;height:30px}
+
+/* Custom script editor shares the existing cards, tokens and team palette. */
+.custom-editor { overflow-wrap: anywhere; }
+.custom-editor .pn, .custom-editor select, .custom-import input { width:100%; max-width:100%; min-width:0; box-sizing:border-box; }
+.custom-editor .cts { margin-top:14px; }
+.custom-editor .ct small { display:block; font-size:10px; }
+.custom-editor textarea { min-height:85px; }
+.custom-row { display:flex; align-items:center; gap:12px; padding:12px; margin-top:8px; }
+.custom-row span { flex:1; min-width:0; }
+.custom-import { padding:12px; margin-top:12px; }
+.cb .custom-letter, .rt-t .custom-letter { display:flex; flex-direction:column; align-items:center; justify-content:center; margin:0; color:var(--tc); font:900 14px/1 var(--serif); }
+.custom-letter small { font:700 8px/1 var(--sans); color:var(--tc); }
+.bar .ttl { min-width:0; overflow-wrap:anywhere; }
+.cl > div, .ns-b { min-width:0; overflow-wrap:anywhere; }

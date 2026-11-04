@@ -33,6 +33,7 @@ export const dist = (S, a, b) => { const n = S.seats.length, d = Math.abs(a - b)
 
 // Is this player's information likely to be false? (drunk, poisoned, the Drunk thinking they're someone, the Vortox)
 export function warnings(S, i, asChar) {
+  if (S.ed === 'custom') return [];
   const s = S.seats[i], w = [];
   if (s.role === 'drunk' || (s.bel && s.bel === asChar)) w.push(`这位其实是${name(s.role)}：能力无效，可以给错误信息`);
   const bad = s.marks.filter(m => /中毒|醉酒/.test(m.t));
@@ -44,6 +45,7 @@ export function warnings(S, i, asChar) {
 
 // The No Dashii's closest Townsfolk neighbours both ways, alive or dead (official wiki), while the No Dashii is alive.
 export function poisonedByNoDashii(S) {
+  if (S.ed === 'custom') return [];
   return S.seats.flatMap((s, i) => s.role === 'nodashii' && !s.dead ? around(S, i, o => team(o) === 'townsfolk') : []);
 }
 // Tea Lady: if both alive neighbours are good, they can't die.
@@ -59,6 +61,7 @@ function teaLady(S) {
 }
 // Standing effects to keep in mind tonight.
 export function standing(S) {
+  if (S.ed === 'custom') return [];
   const out = [...teaLady(S)];
   const nd = poisonedByNoDashii(S);
   if (nd.length) out.push(`诺-达鲺的镇民邻座中毒：${nd.map(j => `${no(j)}（${name(S.seats[j].role)}）`).join('、')}`);
@@ -68,6 +71,7 @@ export function standing(S) {
 
 // What a character in tonight's list would truly learn without choosing anyone. null = nothing to work out.
 export function autoInfo(S, it) {
+  if (S.ed === 'custom') return null;
   if (!it.char || it.dead) return null;
   const c = it.char, i = it.seat, n = S.seats.length, d = S.ph.n - 1;   // d: the day that just ended
   const list = (t, label) => {
@@ -131,6 +135,7 @@ export const PICKS = {
   juggler: { k: 5, tip: '点他白天猜的玩家，再为每人选猜的角色' }
 };
 export function pickInfo(S, it, picks, guesses = {}) {
+  if (S.ed === 'custom') return null;
   const c = it.char, P = PICKS[c];
   if (!P || picks.length !== (c === 'juggler' ? picks.length : P.k) || !picks.length) return null;
   const ss = picks.map(j => S.seats[j]);

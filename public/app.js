@@ -1,8 +1,14 @@
-import { setupCheck, threshold, onBlock, nightList, phaseName, teamOf, isGood, BELIEVE, stepLabel, edChars,
-  MIN_PLAYERS, MAX_PLAYERS, EDITIONS, CHARS, STEPS, TEAM_ZH } from './logic.js';
-import { esc, badge, icon, cname, charList, nightOrder, TEAMS } from './views.js';
+import { setupCheck, threshold, onBlock, nightList, phaseName, teamOf as baseTeamOf, isGood, BELIEVE, stepLabel as baseStepLabel, edChars as baseEdChars,
+  MIN_PLAYERS, MAX_PLAYERS, EDITIONS, CHARS as OFFICIAL_CHARS, STEPS, TEAM_ZH } from './logic.js';
+import { esc, badge as baseBadge, icon as baseIcon, cname as baseCname, charList as baseCharList, nightOrder as baseNightOrder, TEAMS } from './views.js';
 import { autoInfo, pickInfo, PICKS, warnings, standing } from './info.js';
 
+import { charactersOf, editionOf } from './custom.js';
+import { editorView, editorClick, editorInput, openEditor, editorActive } from './editor.js';
+let CHARS = OFFICIAL_CHARS;
+const badge = id => baseBadge(id, S), icon = id => baseIcon(id, S), cname = id => baseCname(id, S);
+const charList = ed => baseCharList(ed, S), nightOrder = (ed, first) => baseNightOrder(ed, first, S);
+const edChars = ed => baseEdChars(ed, S), teamOf = id => baseTeamOf(id, S), stepLabel = k => baseStepLabel(k, S);
 const $ = s => document.querySelector(s);
 const store = {
   get(k) { try { return localStorage.getItem(k); } catch { return null; } },
@@ -78,6 +84,7 @@ function morph(a, b) {
   while (a.childNodes.length > bc.length) a.removeChild(a.lastChild);
 }
 function render() {
+  CHARS = charactersOf(S);
   const t = document.createElement('div');
   t.innerHTML = `<div class="back-nav" data-k="back-nav" data-html2canvas-ignore>${code
     ? '<button class="back-pill" data-act="leave">‹ 首页</button>'
@@ -96,7 +103,7 @@ function view() {
   return bar() + `<div class="wrap" data-k="${role}-${S.stage}">` + (role === 'st' ? stView() : publicPage()) + '</div>';
 }
 const hero = () => `<div class="hero" data-k="hero"><div class="en">BLOOD ON THE CLOCKTOWER</div><h1>血染钟楼助手</h1><div class="orn"></div></div><div class="band"></div>`;
-const bar = () => `<div class="bar" data-k="bar"><span class="ttl">血染钟楼${S?.ed ? `<small>${esc(EDITIONS[S.ed].zh)}</small>` : ''}</span>
+const bar = () => `<div class="bar" data-k="bar"><span class="ttl">血染钟楼${S?.ed ? `<small>${esc(editionOf(S).zh)}</small>` : ''}</span>
   <span class="who-tag ${role === 'st' ? 'mm' : 'view'}">${role === 'st' ? '说书人' : '玩家'}</span>
   <button class="room" data-act="share"><small>房间</small>${code}</button><span class="conn ${online ? 'on' : ''}" title="${online ? '已连接' : '重新连接中'}"></span></div>`;
 
@@ -151,14 +158,17 @@ function stView() {
 }
 
 function setupView() {
-  const ed = S.ed, chk = ed ? setupCheck(ed, S.n, S.bag) : null;
+  if (editorActive()) return editorView(S.n || 7);
+  const ed = S.ed, chk = ed ? setupCheck(ed, S.n, S.bag, S) : null;
   const edChips = Object.entries(EDITIONS).map(([k, e]) => `<button class="chip${ed === k ? ' on' : ''}" data-act="ed" data-ed="${k}">${esc(e.zh)}</button>`).join('');
   let out = `<p class="note secret">这是<b>说书人视图</b>，有所有人的身份，别让玩家看到。玩家扫码进入的是玩家视图。</p>
     <h2 class="h"><span>1 剧本和人数</span></h2>
     <div class="chips">${edChips}</div>
-    ${ed ? `<p class="hint-s">${esc(EDITIONS[ed].en)}${EDITIONS[ed].alias?.length ? ` · 也叫${EDITIONS[ed].alias.map(esc).join('、')}` : ''}</p>` : ''}
+    <div class="btns"><button class="btn ghost" data-act="custom-new">新建自定义剧本</button><button class="btn ghost" data-act="custom-import">导入 / 最近使用</button></div>
+    ${ed ? `<button class="btn ghost" data-act="${ed === 'custom' ? 'custom-edit' : 'custom-copy'}">${ed === 'custom' ? '编辑自定义剧本' : '复制为自定义剧本'}</button>` : ''}
+    ${ed ? `<p class="hint-s">${esc(editionOf(S).en)}${editionOf(S).alias?.length ? ` · 也叫${editionOf(S).alias.map(esc).join('、')}` : ''}</p>` : ''}
     <div class="card cnt"><b>玩家人数</b><button class="ib" data-act="n" data-d="-1" ${!ed || S.n <= MIN_PLAYERS ? 'disabled' : ''}>−</button><span class="n">${S.n || '–'}</span><button class="ib" data-act="n" data-d="1" ${!ed || S.n >= MAX_PLAYERS ? 'disabled' : ''}>+</button></div>`;
-  if (!ed) return out + '<p class="note">先选剧本。首版支持基础盒的三个剧本，不含旅行者和传奇角色。</p>';
+  if (!ed) return out + '<p class="note">先选剧本。可用现有 72 个官方角色自建剧本；内置剧本不可编辑，自制角色只能加入自定义剧本。</p>';
   const need = chk.options.length === 1 ? chk.options[0] : null;
   const cnt = TEAMS.map(t => {
     const want = [...new Set(chk.options.map(o => o[t]))].join(' 或 ');
@@ -195,7 +205,7 @@ function nightView() {
   const extra = k => k === 'minioninfo' ? `<span class="ns-x">爪牙：${evil('minion')}；恶魔：${evil('demon')}</span>`
     : k === 'demoninfo' ? `<span class="ns-x">爪牙：${evil('minion')}；伪装：${S.bluffs.length ? S.bluffs.map(id => esc(CHARS[id].zh)).join('、') : '<button class="lnk" data-act="bluffs">还没选，点这里选</button>'}</span>` : '';
   return `${statusStrip(S)}
-    <p class="note">${S.ph.n === 1 ? '首夜' : '今晚'}要叫醒的角色，按官方夜晚顺序。叫完一个就点左边的圈；给了什么信息记在下面那一行，终局复盘会用到。${S.n < 7 && S.ph.n === 1 ? '<b>5–6 人局：首夜没有爪牙信息和恶魔信息。</b>' : ''}</p>
+    <p class="note">${S.ph.n === 1 ? '首夜' : '今晚'}要叫醒的角色，${S.ed === 'custom' ? '按本局快照夜晚顺序' : '按官方夜晚顺序'}。叫完一个就点左边的圈；给了什么信息记在下面那一行，终局复盘会用到。${S.n < 7 && S.ph.n === 1 ? '<b>5–6 人局：首夜没有爪牙信息和恶魔信息。</b>' : ''}</p>
     ${standing(S).length ? `<div class="card ns-stand">${standing(S).map(t => `<p>${esc(t)}</p>`).join('')}</div>` : ''}
     <div class="card nlist">${list.map((x, n) => {
       const on = !!S.done[x.k], st = x.seat != null ? S.seats[x.seat] : null;
@@ -259,6 +269,7 @@ function ring(st, priv) {
 
 // Under a step of tonight's list: what this character would truly learn (Storyteller's reference only).
 function infoBlock(x) {
+  if (S.ed === 'custom') return x.char ? '<p class="hint-s">手动记录：自定义剧本停用真实信息及常驻效果计算，能力互动由说书人判断。</p>' : '';
   if (!x.char || x.dead) return '';
   const auto = autoInfo(S, x), P = PICKS[x.char], w = warnings(S, x.seat, x.char);
   const math = S.seats.some(o => o.role === 'mathematician' || o.bel === 'mathematician') && x.char !== 'mathematician';
@@ -291,7 +302,7 @@ function logTab() {
 }
 
 function refTab() {
-  return `<details class="card ref" open><summary>${esc(EDITIONS[S.ed].zh)}的角色</summary><div class="ref-sec">${charList(S.ed)}</div></details>
+  return `<details class="card ref" open><summary>${esc(editionOf(S).zh)}的角色</summary><div class="ref-sec">${charList(S.ed)}</div></details>
     <details class="card ref" style="margin-top:8px"><summary>首夜顺序</summary>${nightOrder(S.ed, true)}</details>
     <details class="card ref" style="margin-top:8px"><summary>其他夜晚顺序</summary>${nightOrder(S.ed, false)}</details>
     <a class="btn ghost" href="guide" target="_blank">规则介绍与常见问题</a>`;
@@ -305,7 +316,7 @@ function overView(st, isSt) {
   for (const e of st.log || []) { let g = groups.find(x => x.at === e.at); if (!g) groups.push(g = { at: e.at, xs: [] }); g.xs.push(e); }
   const days = [...new Set(st.noms.map(x => x.d).concat(st.execs.map(x => x.d)))].sort((a, b) => a - b);
   return `<div id="shot" style="padding-top:2px">
-    <div class="mvp ${good ? 'good' : 'evil'}"><div class="crown">BLOOD ON THE CLOCKTOWER · ${esc(EDITIONS[st.ed].zh)}</div><div class="nm">${good ? '善良阵营获胜' : '邪恶阵营获胜'}</div>
+    <div class="mvp ${good ? 'good' : 'evil'}"><div class="crown">BLOOD ON THE CLOCKTOWER · ${esc(editionOf(st).zh)}</div><div class="nm">${good ? '善良阵营获胜' : '邪恶阵营获胜'}</div>
       <div class="fg">${st.why ? esc(st.why) + '<br>' : ''}${st.seats.length} 人局 · 进行到${phaseName(st.ph)}</div></div>
     <h2 class="h"><span>魔典</span><small>每个人的真实身份</small></h2>
     <div class="list">${st.seats.map((x, i) => `<div class="card grim${x.dead ? ' dead' : ''}" data-k="og-${i}"><span class="sno">${i + 1}</span>${badge(x.role)}
@@ -332,7 +343,7 @@ function publicPage() {
   const me = mySeat();
   const meBar = `<div class="card mebar">${me === null ? '<span>你坐几号？</span>' : `<span>我是 <b>${seatNo(me)}</b> ${esc(st.seats[me].name)}</span>`}<button class="btn ghost sm" data-act="me">${me === null ? '选座位' : '换座位 / 改名字'}</button></div>`;
   if (st.stage === 'setup') return `<h2 class="h"><span>说书人正在准备</span></h2>
-    <p class="note">${st.ed ? `本局剧本：<b>${esc(EDITIONS[st.ed].zh)}</b>，${st.n} 人。` : ''}先选你的座位、填上名字，说书人那边就会显示。身份照常线下抽。</p>
+    <p class="note">${st.ed ? `本局剧本：<b>${esc(editionOf(st).zh)}</b>，${st.n} 人。` : ''}先选你的座位、填上名字，说书人那边就会显示。身份照常线下抽。</p>
     ${st.n ? meBar : ''}
     ${st.seats.length ? `<div class="list">${st.seats.map((x, i) => `<div class="card pseat${i === me ? ' me' : ''}" data-k="ps-${i}"><span class="sno">${i + 1}</span><b>${esc(x.name) || '<span style="color:var(--ink3)">还没填名字</span>'}</b></div>`).join('')}</div>` : ''}
     ${st.ed ? `<h2 class="h"><span>本剧本的角色</span></h2><div class="card ref-sec">${charList(st.ed)}</div>` : ''}
@@ -340,7 +351,7 @@ function publicPage() {
   const tabs = [['town', '广场'], ['roles', '角色表'], ['notes', '我的笔记']];
   const head = `<div class="tabs">${tabs.map(([k, n]) => `<button class="tab${ui.ptab === k ? ' on' : ''}" data-act="ptab" data-tab="${k}">${n}</button>`).join('')}</div>`;
   let body;
-  if (ui.ptab === 'roles') body = `<details class="card ref" open><summary>${esc(EDITIONS[st.ed].zh)}的角色</summary><div class="ref-sec">${charList(st.ed)}</div></details>
+  if (ui.ptab === 'roles') body = `<details class="card ref" open><summary>${esc(editionOf(st).zh)}的角色</summary><div class="ref-sec">${charList(st.ed)}</div></details>
     <details class="card ref" style="margin-top:8px"><summary>首夜顺序</summary>${nightOrder(st.ed, true)}</details>
     <details class="card ref" style="margin-top:8px"><summary>其他夜晚顺序</summary>${nightOrder(st.ed, false)}</details>
     <a class="btn ghost" href="guide">规则介绍与常见问题</a>`;
@@ -569,6 +580,12 @@ document.addEventListener('click', async e => {
     case 'rv-edit': ui.rv.state = ''; return render();
   }
   if (role !== 'st') return;
+  if (a.startsWith('custom-')) {
+    if (S.stage !== 'setup') return;
+    if (['custom-new', 'custom-copy', 'custom-edit', 'custom-import'].includes(a)) { openEditor(a, S); window.scrollTo(0, 0); }
+    else await editorClick(a, d, { use: script => send({ t: 'setup', ed: 'custom', n: S.n || 7, script }) });
+    return render();
+  }
   switch (a) {
     case 'ed': send({ t: 'setup', ed: d.ed, n: S.n || 7 }); return;
     case 'n': send({ t: 'setup', ed: S.ed, n: S.n + +d.d }); return;
@@ -610,11 +627,13 @@ document.addEventListener('click', async e => {
 });
 document.addEventListener('input', e => {
   const d = e.target.dataset;
+  if (editorActive() && editorInput(e, render)) return;
   if (d.rv === 'text') ui.rv.text = e.target.value;
   if (d.rv === 'name') ui.rv.name = e.target.value;
   if (d.note !== undefined && role !== 'st') saveNote(d.note, e.target.value);
 });
 document.addEventListener('change', e => {
+  if (editorActive() && editorInput(e, render)) return;
   const d = e.target.dataset;
   if (role !== 'st') return;
   if (d.jug !== undefined) { ui.jug[d.jug] = { ...(ui.jug[d.jug] || {}), [d.i]: e.target.value }; return render(); }
