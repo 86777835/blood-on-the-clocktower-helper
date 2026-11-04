@@ -37,6 +37,7 @@ open(out, 'w').write(f'''<!doctype html>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
+<div class="back-nav" data-html2canvas-ignore><a class="back-pill" href="/">‹ 返回</a></div>
 <div style="position:absolute;width:0;height:0;overflow:hidden"><img src="img/icon-512.jpg" alt=""></div>
 <div class="hero-art" style="height:calc(env(safe-area-inset-top) + 190px)"><img src="img/guide.jpg" alt="" style="object-position:50% 50%"><div class="ht"><div class="hz">规则介绍</div><div class="hs">血染钟楼 · 基础规则</div></div></div>
 <div class="wrap guide">
