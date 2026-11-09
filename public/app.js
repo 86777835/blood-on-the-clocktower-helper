@@ -88,7 +88,7 @@ function render() {
   const t = document.createElement('div');
   t.innerHTML = `<div class="back-nav" data-k="back-nav" data-html2canvas-ignore>${code
     ? '<button class="back-pill" data-act="leave">‹ 首页</button>'
-    : '<a class="back-pill" href="https://boardgame.leisurecat.cloud">‹ 全部游戏</a>'}</div>` + view();
+    : `<a class="back-pill" href="https://boardgame.leisurecat.cloud">‹ 全部游戏</a><a class="back-pill rate-nav" href="https://boardgame.leisurecat.cloud/?rate=botc&back=${encodeURIComponent(location.href)}">★ 写评价</a>`}</div>` + view();
   morph($('#app'), t);
   const sh = document.createElement('div');
   sh.innerHTML = ui.sheet && S ? sheetView() : '';

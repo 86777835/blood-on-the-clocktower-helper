@@ -648,3 +648,5 @@ img.ccc{display:block;width:110px;height:auto;margin:8px auto 0;opacity:.85}
 .custom-letter small { font:700 8px/1 var(--sans); color:var(--tc); }
 .bar .ttl { min-width:0; overflow-wrap:anywhere; }
 .cl > div, .ns-b { min-width:0; overflow-wrap:anywhere; }
+/* 写评价: opens this game's review form on the hub, then 返回 comes back here */
+.back-nav:has(.rate-nav){display:flex;justify-content:space-between;padding-right:calc(env(safe-area-inset-right) + 12px)}
