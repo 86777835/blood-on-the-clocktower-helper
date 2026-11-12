@@ -650,3 +650,11 @@ img.ccc{display:block;width:110px;height:auto;margin:8px auto 0;opacity:.85}
 .cl > div, .ns-b { min-width:0; overflow-wrap:anywhere; }
 /* 写评价: opens this game's review form on the hub, then 返回 comes back here */
 .back-nav:has(.rate-nav){display:flex;justify-content:space-between;padding-right:calc(env(safe-area-inset-right) + 12px)}
+
+/* rules assistant: answers found on the web (labelled as unchecked, with sources) */
+.cweb{margin:-2px 0 6px;padding:5px 8px;border-radius:7px;background:rgba(201,164,92,.14);font:500 12px/1.5 var(--sans);color:var(--ink2)}
+.cweb b{color:var(--red2)}
+.csrc{margin-top:8px;padding-top:6px;border-top:1px dashed var(--line2);font:12px/1.5 var(--sans);color:var(--ink2)}
+.csrc a{display:block;color:var(--gold2);text-decoration:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.csrc i{margin-left:6px;font-style:normal;color:var(--ink3)}
+.cwait{display:block;margin-bottom:4px;font:500 12.5px var(--sans);color:var(--ink2)}

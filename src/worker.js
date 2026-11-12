@@ -71,13 +71,34 @@ async function checkDeepSeek(env) {
   }
 }
 
+// Web search (2026-11-12, after the Pittsburgh pilot): when the guide, FAQ and character notes don't cover a rules
+// question, the model replies only with WEB_MARK + English search words. The server then asks DeepSeek's search API and
+// answers again from the results; the page labels those answers as web discussion this site has not checked, with sources.
+// The search words are the rules question only: nothing about any room, grimoire or character is ever sent here.
+const WEB_MARK = '【需联网】';
+const WEB_RESULTS = 6;
+const WEB_NONE = '本站资料里没有这一条，网上也没找到可靠的说法。建议翻一下官方 Wiki，或者问问本局说书人。';
+const webSystem = results => `你是「血染钟楼规则助手」，帮玩家解答桌游《血染钟楼》（Blood on the Clocktower，中文版《染·钟楼谜团》）的规则问题。本站整理的资料里没有这个问题的答案，下面是联网搜索到的网页摘要。
+
+回答要求：
+- 只依据这些摘要作答，用 [1] [2] 这样的编号注明依据哪条。
+- 优先采信官方 Wiki（wiki.bloodontheclocktower.com）、设计者和出版方的说法；网友的说法要说明是网友观点；不同说法冲突时直接指出来。
+- 角色名用中文版译名：${Object.values(CHARS).map(c => `${c.en}=${c.zh}`).join('，')}。
+- 官方也说明由说书人决定的地方，就说由本局说书人决定。摘要里没有可靠答案就直接说没找到，不要自己推测规则。
+- 你不知道、也绝不谈论本局任何人的身份。
+- 用简体中文，简短直接：先给结论，再补一两句理由。可以用短列表，不要用表格和标题。
+
+${results.map((r, i) => `[${i + 1}] ${r.title}（${r.site}）\n${r.summary}`).join('\n\n')}`;
+
 const RULES_SYSTEM = `你是「血染钟楼规则助手」，解答桌游《血染钟楼》（Blood on the Clocktower，中文版《染·钟楼谜团》）的规则问题，也可以解释本网站「血染钟楼助手」怎么用。
 
 回答要求：
-- 只依据下面的「规则讲解」「常见问题」和「角色简述」作答，它们是本站依据官方 Wiki 和集石钟楼百科自己整理的。资料里没有的内容，直接说资料里没有、建议问本局说书人，不要编造规则。
-- 你可能正被任何一名玩家使用。你不知道、也绝不谈论本局任何人的身份、阵营、中毒醉酒状态或夜里得到的信息；被问“谁是恶魔”“X 号是不是好人”这类问题，就说规则助手不知道本局的任何身份，也不帮忙推理。
-- 角色之间少见或有歧义的互动，不要下定论：说明资料里的通用规则，然后说明具体怎么判由本局说书人决定。
-- 与本游戏无关的问题，礼貌说明你只解答血染钟楼规则。
+- 只依据下面的「规则讲解」「常见问题」和「角色简述」作答，它们是本站依据官方 Wiki 和集石钟楼百科自己整理的，不要编造规则。
+- 资料里找不到答案的血染钟楼规则问题（包括某个角色具体怎么运作、两个角色怎么互动），不要自己回答，也不要解释为什么查不到：整个回复只有一行，以${WEB_MARK}开头，后面接一组英文搜索词，以 Blood on the Clocktower 开头，角色用下面「角色简述」里对应的英文名，例如：${WEB_MARK}Blood on the Clocktower Mathematician Philosopher drunk。网站会去网上查。
+- 搜索词只能是规则问题本身：绝不能写进座位号、玩家名字、本局谁是什么角色、说书人给过的信息。
+- 你可能正被任何一名玩家使用。你不知道、也绝不谈论本局任何人的身份、阵营、中毒醉酒状态或夜里得到的信息；被问“谁是恶魔”“X 号是不是好人”这类问题，就说规则助手不知道本局的任何身份，也不帮忙推理，不要输出${WEB_MARK}。
+- 资料里没写清的角色细节或角色互动，照上面一条输出${WEB_MARK}去网上查，不要因为资料没写就直接说“由说书人决定”。只有资料里或官方说法明确交给说书人的地方，才说由本局说书人决定。
+- 与本游戏无关的问题，礼貌说明你只解答血染钟楼规则，不要输出${WEB_MARK}。
 - 用简体中文，简短直接：先给结论，再补一两句理由或例子。可以用短列表，不要用表格和标题。
 
 本网站怎么用：说书人用手机建房间，选剧本和人数、选角色放进袋子，玩家线下抽实体角色标记后，说书人按座位录入。夜里看夜晚清单逐项打勾、记下给了谁什么信息；白天记提名、点选举手的人，自动算票数和处决门槛；终局后所有人都能看到完整魔典和记录，可以保存复盘长图。玩家扫码进房间，只能看到公开信息（谁死了、幽灵票、提名票型）、本剧本的角色表和自己的笔记。
@@ -89,7 +110,7 @@ ${GUIDE}
 ${FAQ.map(f => `【${f.cat}】问：${f.q}\n答：${f.a}`).join('\n\n')}
 
 # 角色简述（本站自写，按剧本）
-${Object.entries(EDITIONS).map(([ed, e]) => `## ${e.zh}（${e.en}）\n` + e.chars.map(id => `${CHARS[id].zh}（${TEAM_ZH[CHARS[id].team]}）：${CHARS[id].gist}`).join('\n')).join('\n\n')}`;
+${Object.entries(EDITIONS).map(([ed, e]) => `## ${e.zh}（${e.en}）\n` + e.chars.map(id => `${CHARS[id].zh}（${CHARS[id].en}，${TEAM_ZH[CHARS[id].team]}）：${CHARS[id].gist}`).join('\n')).join('\n\n')}`;
 
 async function chat(req, env) {
   if (!env.DEEPSEEK_API_KEY) return Response.json({ error: '规则助手还没有配置好，请稍后再试' }, { status: 503 });
@@ -102,18 +123,58 @@ async function chat(req, env) {
     && msgs.every(m => ['user', 'assistant'].includes(m?.role) && typeof m.content === 'string' && m.content.trim() && m.content.length <= 3000);
   if (!valid) return Response.json({ error: '问题格式不对，请刷新页面再试' }, { status: 400 });
   console.log('chat question', JSON.stringify(msgs.at(-1).content));   // what players ask, for the usage brief
-  const system = RULES_SYSTEM;
-  const messages = [{ role: 'system', content: system }, ...msgs.slice(-10).map(m => ({ role: m.role, content: m.content }))];
+  const history = msgs.slice(-10).map(m => ({ role: m.role, content: m.content }));
+  let messages = [{ role: 'system', content: RULES_SYSTEM }, ...history];
   const fails = [];   // HTTP status, 0 = unreachable or error, 'queue' = no answer started in time or stalled
   const order = await env.CHAT_STATE.get(DEEPSEEK_DOWN) ? ORDER.deepseekDown : ORDER.normal;
   let cur = await firstAnswer(order, 0, env, messages, fails);
   if (!cur) return Response.json({ error: chatFailed(fails) }, { status: 502 });
   const enc = new TextEncoder(), dec = new TextDecoder();
   const event = o => enc.encode(`data: ${JSON.stringify(o)}\n\n`);
-  let lastData = Date.now();
+  const say = text => event({ choices: [{ delta: { content: text } }] });
+  let lastData = Date.now(), searched = false, raw = '', pend = '';   // raw: the current model's stream so far, as text
+  // Only whole lines go to the page, so dropping the rest of a model's stream (search, backup model) never leaves it half a line.
+  // Returns whether anything went out.
+  const forward = (c, text) => {
+    pend += text;
+    const cut = pend.lastIndexOf('\n') + 1;
+    if (cut) { c.enqueue(enc.encode(pend.slice(0, cut))); pend = pend.slice(cut); }
+    return cut > 0;
+  };
+  const headText = () => cur.head.map(v => dec.decode(v, { stream: true })).join('');
+  // The model asked to search: tell the page, search, then answer again from the results. Returns false when the
+  // stream is finished (nothing found, or no model answered), true when `cur` is the answer from the results.
+  async function web(c, query) {
+    cur.reader.cancel().catch(() => {});
+    searched = true;
+    c.enqueue(event({ searching: true }));
+    const found = await webSearch(env, query, history.at(-1).content);
+    console.log('chat web search', JSON.stringify(query), found ? found.length : 'failed');   // for the usage brief: questions the FAQ lacks
+    if (!found?.length) {
+      c.enqueue(event({ web: [] }));
+      c.enqueue(say(found ? WEB_NONE : '本站资料里没有这一条，联网查找也失败了，请过一会儿再问，或者翻一下规则书。'));
+      c.close(); return false;
+    }
+    messages = [{ role: 'system', content: webSystem(found) }, ...history];
+    const next = await firstAnswer(order, 0, env, messages, fails);
+    if (!next) { c.enqueue(event({ error: chatFailed(fails) })); c.close(); return false; }
+    cur = next; lastData = Date.now(); raw = ''; pend = '';
+    c.enqueue(event({ web: found.map(r => ({ title: r.title, url: r.url, site: r.site })) }));
+    return true;
+  }
+  // Before anything reaches the page, look at how the answer starts. The search itself runs in the first pull:
+  // Workers starts pulling without waiting for an async start().
+  let query = await webQuery(cur);
   const stream = new ReadableStream({
-    start(c) { cur.head.forEach(v => c.enqueue(v)); },
+    start(c) { if (query === null) { raw = headText(); forward(c, raw); } },
     async pull(c) {
+      if (query !== null) {
+        const q = query; query = null;
+        if (await web(c, q)) forward(c, headText());
+        return;
+      }
+      // A pull that sends nothing is never followed by another one: read on until a whole line can go out.
+      for (;;) {
       // Keep-alive comments don't count as progress: only data lines do.
       let timer, r;
       const stall = new Promise(ok => { timer = setTimeout(() => ok('stall'), Math.max(0, lastData + STALL_MS - Date.now())); });
@@ -125,20 +186,107 @@ async function chat(req, env) {
         cur.reader.cancel().catch(() => {});
         const next = await firstAnswer(order, cur.k + 1, env, messages, fails);
         if (!next) { c.enqueue(event({ error: chatFailed(fails) })); return c.close(); }
-        cur = next; lastData = Date.now();
+        cur = next; lastData = Date.now(); raw = ''; pend = '';
         c.enqueue(event({ reset: CHAT_MODELS[cur.i].name }));   // the page drops the partial answer and starts over
-        cur.head.forEach(v => c.enqueue(v));
+        // the backup model may ask to search too (only from the tutorial-and-FAQ round)
+        const q2 = searched ? null : await webQuery(cur);
+        if (q2 !== null && !(await web(c, q2))) return;
+        const head = headText();
+        if (!searched) raw = head;
+        forward(c, head);
         return;
       }
-      if (r.done) return c.close();
-      if (dec.decode(r.value, { stream: true }).includes('data:')) lastData = Date.now();
-      c.enqueue(r.value);
+      if (r.done) { if (pend) c.enqueue(enc.encode(pend)); return c.close(); }
+      const piece = dec.decode(r.value, { stream: true });
+      if (piece.includes('data:')) lastData = Date.now();
+      if (!searched) {
+        // The model sometimes explains first and asks to search at the end: stop there and search instead
+        // (the page clears what it showed when the search starts).
+        raw += piece;
+        const text = sseText(raw), at = text.indexOf(WEB_MARK);
+        if (at >= 0) {
+          const q = (text.slice(at + WEB_MARK.length) + await restText(cur)).trim().split('\n')[0].trim().slice(0, 120);
+          console.log('chat web mark mid-answer');
+          if (await web(c, q)) forward(c, headText());
+          return;
+        }
+      }
+      if (forward(c, piece)) return;
+      }
     },
     cancel() { cur.reader.cancel().catch(() => {}); }
   });
   const h = { 'content-type': 'text/event-stream; charset=utf-8', 'cache-control': 'no-cache' };
   if (cur.i) h['x-chat-fallback'] = CHAT_MODELS[cur.i].name;
   return new Response(stream, { headers: h });
+}
+
+// Text of the answer in a model's raw stream (DeepSeek and Workers AI both send OpenAI-style chunks).
+function sseText(raw) {
+  let text = '';
+  for (const line of raw.split('\n')) {
+    if (!line.startsWith('data:')) continue;
+    try { const j = JSON.parse(line.slice(5)); text += j.choices?.[0]?.delta?.content ?? j.response ?? ''; } catch {}
+  }
+  return text;
+}
+const streamText = chunks => { const dec = new TextDecoder(); return sseText(chunks.map(v => dec.decode(v, { stream: true })).join('')); };
+
+// The rest of a model's answer as text (for the search words after the marker), waiting at most STALL_MS.
+async function restText(cur) {
+  const dec = new TextDecoder(), until = Date.now() + STALL_MS;
+  let raw = '';
+  for (;;) {
+    let r;
+    try { r = await Promise.race([cur.reader.read(), new Promise(ok => setTimeout(() => ok({ done: true }), Math.max(0, until - Date.now())))]); } catch { r = { done: true }; }
+    if (r.done) return sseText(raw);
+    raw += dec.decode(r.value, { stream: true });
+  }
+}
+
+// Reads ahead (into cur.head) until the answer's first characters show whether it is a search request.
+// Returns the search words, or null for an ordinary answer. Stops reading after STALL_MS; the stream's own stall check takes over.
+async function webQuery(cur) {
+  const until = Date.now() + STALL_MS;
+  for (;;) {
+    const text = streamText(cur.head).trimStart();
+    const marked = text.startsWith(WEB_MARK);
+    if (!marked && (text.length >= WEB_MARK.length || !WEB_MARK.startsWith(text))) return null;
+    let r;
+    try { r = await Promise.race([cur.reader.read(), new Promise(ok => setTimeout(() => ok('late'), Math.max(0, until - Date.now())))]); } catch { r = { done: true }; }
+    if (r === 'late') return marked ? text.slice(WEB_MARK.length).trim().slice(0, 120) : null;
+    if (r.done) return marked ? text.slice(WEB_MARK.length).trim().slice(0, 120) : null;
+    cur.head.push(r.value);
+  }
+}
+
+// DeepSeek's search API. The official wiki is the authority for this game, so it goes first; with fewer than 3 results
+// there, BoardGameGeek and the whole web (both at once). Returns [{ title, url, site, summary }] (possibly empty),
+// or null when every search failed.
+async function webSearch(env, query, question) {
+  query ||= `Blood on the Clocktower ${question}`;
+  const wiki = await searchOnce(env, `${query} site:wiki.bloodontheclocktower.com`.slice(0, 128), question);
+  if (wiki?.length >= 3) return wiki;
+  const [bgg, all] = await Promise.all([searchOnce(env, `${query} site:boardgamegeek.com`.slice(0, 128), question), searchOnce(env, query.slice(0, 128), question)]);
+  if (wiki === null && bgg === null && all === null) return null;
+  const seen = new Set(), out = [];
+  for (const r of [...(wiki || []), ...(bgg || []), ...(all || [])]) if (!seen.has(r.url)) { seen.add(r.url); out.push(r); }
+  return out.slice(0, WEB_RESULTS);
+}
+async function searchOnce(env, query, question) {
+  const base = env.DEEPSEEK_BASE || 'https://api.deepseek.com';   // DEEPSEEK_BASE: set only by the local tests
+  try {
+    const r = await fetch(`${base}/v1/tools/search`, {
+      method: 'POST', signal: AbortSignal.timeout(6000),
+      headers: { 'content-type': 'application/json', authorization: `Bearer ${env.DEEPSEEK_API_KEY}` },
+      body: JSON.stringify({ query, ori_question: question.slice(0, 128), count: 10 })
+    });
+    if (!r.ok) { console.log('chat web search error', r.status, (await r.text()).slice(0, 300)); return null; }
+    const { results = [] } = await r.json();
+    // wiki revision and diff pages (…?oldid=, &diff=) can hold outdated wording: only current pages count
+    return results.filter(x => x.url && (x.summary || x.snippet) && !/[?&](diff|oldid|direction|action)=/.test(x.url)).slice(0, WEB_RESULTS)
+      .map(x => ({ title: x.title || x.url, url: x.url, site: x.site_name || new URL(x.url).hostname, summary: (x.summary || x.snippet).slice(0, 900) }));
+  } catch (e) { console.log('chat web search failed', String(e).slice(0, 200)); return null; }
 }
 
 const chatFailed = fails => fails.some(f => f === 503 || f === 429 || f === 'queue')   // overloaded / throttled / queueing

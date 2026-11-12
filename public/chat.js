@@ -1,7 +1,7 @@
 // Rules assistant: a floating button (bottom right) that opens a chat panel. Answers stream from /api/chat.
 // It only knows the rules (the server sends it nothing about the game in this room), so anyone can use it.
 const MODES = {
-  rules: { title: '血染钟楼规则助手', sub: '依据规则讲解与常见问题作答', av: '规', gold: false,
+  rules: { title: '血染钟楼规则助手', sub: '依据规则书作答，查不到会联网找', av: '规', gold: false,
     sug: ['死人还能投票吗？', '平票了怎么办？', '醉酒和中毒有什么区别？', '男爵在场为什么外来者多了？'],
     welcome: ['有规则问题，尽管问', '提名、投票、处决、醉酒中毒……只讲规则，不知道本局任何人的身份'], ph: '问规则，比如：处决需要几票？' }
 };
@@ -63,10 +63,17 @@ async function ask(q) {
   bubble('u', fmt(q));
   msgs.push({ role: 'user', content: q });
   const out = bubble('a', '<i class="cdots"><b></b><b></b><b></b></i>');
-  let text = '', fb = null;
+  let text = '', fb = null, web = null;   // web: sources when the answer comes from a web search
   const t0 = Date.now();
   // When DeepSeek is overloaded it queues the request and sends nothing; stop waiting if no text in 30 s.
-  const ctl = new AbortController(), timer = setTimeout(() => ctl.abort(), 30000);
+  const ctl = new AbortController();
+  let timer = setTimeout(() => ctl.abort(), 30000);
+  // An answer from the web is labelled as unchecked by this site, with its sources under it.
+  const show = () => {
+    const head = web?.length ? '<div class="cweb">本站资料没有这一条，以下来自网上讨论，<b>本站未核对</b>，请自行判断</div>' : '';
+    const src = web?.length ? `<div class="csrc">来源：${web.map((w, i) => `<a href="${esc(w.url)}" target="_blank" rel="noopener">[${i + 1}] ${esc(w.title)}<i>${esc(w.site)}</i></a>`).join('')}</div>` : '';
+    out.innerHTML = head + fmt(text) + src; log.scrollTop = log.scrollHeight;
+  };
   try {
     const body = { messages: msgs.slice(-10) };   // the server keeps only the last 10 and rejects over 20
     const r = await fetch('/api/chat', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body), signal: ctl.signal });
@@ -87,8 +94,13 @@ async function ask(q) {
         const j = JSON.parse(data);
         if (j.error) throw new Error(j.error);
         if (j.reset) { text = ''; fb = j.reset; out.innerHTML = '<i class="cdots"><b></b><b></b><b></b></i>'; continue; }   // the model stalled; the next one starts over
+        if (j.searching) {   // not in this site's notes: the server is searching the web, which takes a few more seconds
+          clearTimeout(timer); timer = setTimeout(() => ctl.abort(), 30000); text = '';   // drop anything shown before the search
+          out.innerHTML = '<span class="cwait">本站资料里没有，正在联网查找…</span><i class="cdots"><b></b><b></b><b></b></i>'; continue;
+        }
+        if (j.web) { web = j.web; continue; }
         const piece = j.choices?.[0]?.delta?.content;
-        if (piece) { clearTimeout(timer); text += piece; out.innerHTML = fmt(text); log.scrollTop = log.scrollHeight; }
+        if (piece) { clearTimeout(timer); text += piece; show(); }
       }
     }
     if (!text) throw new Error('没有收到回答，请再问一次');

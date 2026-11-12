@@ -102,7 +102,9 @@
   - 每个模型 9 秒内须开始回答，中途停顿超过 8 秒就换下一个。
   - 每小时用 cron 检查 DeepSeek，不通时下一小时先用 Qwen。
   - 回答下方不显示是哪个模型。
-  - **只讲规则**：请求里只有对话内容，服务端也不会往提示词里放任何房间数据，所以它不可能知道本局的身份。被问"谁是恶魔"会直接拒绝。角色之间有歧义的互动不下定论，交给说书人裁定。
+  - **只讲规则**：请求里只有对话内容，服务端也不会往提示词里放任何房间数据，所以它不可能知道本局的身份。被问"谁是恶魔"会直接拒绝。本站资料没写清的角色细节和互动会联网查（见下一条）；只有官方明确交给说书人的地方，才回答由说书人裁定。
+  - **联网查找**（2026-11-12 起，用户批准的兜底，照匹兹堡试点移植）：本站资料（讲解稿、常见问题、角色简述）答不了的规则问题，模型只回一行 `【需联网】` 加英文搜索词（以 Blood on the Clocktower 开头，角色用英文名），服务端调 DeepSeek 搜索接口（`/v1/tools/search`，6 秒超时）：**先搜官方 Wiki**（`site:wiki.bloodontheclocktower.com`），不到 3 条再同时搜 BGG 和全网，合并去重最多 6 条；Wiki 的历史修订和差异页（链接带 `oldid=`、`diff=`）会被排除，免得引到旧说法。再请模型只依据这些摘要回答并用 [1] [2] 标出处，角色名换成中文版译名。页面在回答上方标「本站资料没有这一条，以下来自网上讨论，**本站未核对**，请自行判断」，下面列出来源链接；没搜到或搜索失败时直接说明，不编答案。无关问题、问本局身份的问题不联网。每次联网在日志记一条 `chat web search`，用来统计常见问题缺哪些。
+  - **联网也不带对局信息**：搜索词只由模型从规则问题里生成，服务端本来就没有房间数据；`--mock-web` 测试会开一局带秘密名字和笔记的对局，确认搜索请求里一个字都没有。
 
 ### 给这款游戏打分
 
@@ -144,7 +146,7 @@
 - 角色头像用 TPI 向社区工具开放的官方角色图标（[botc-release/resources/characters](https://github.com/ThePandemoniumInstitute/botc-release/tree/main/resources/characters)，镇民和外来者用善良版、爪牙和恶魔用邪恶版，缩小到 128px 放在 `public/img/roles/`），按资源说明在页脚展示官方"Community Created Content"标识（`public/img/ccc.png`）。中国大陆的中文版权在集石，如被要求可以随时换回文字徽章。
 - 首页封面是集石中文版《染·钟楼谜团》游戏盒封面原图（取自集石游戏页），未经 AI 重绘，封面版权归出版社所有。
 - 网站图标、教程横幅、规则助手欢迎图是用 Codex 生成的原创插画。
-- 规则助手不对角色之间有歧义的互动下定论，最终以说书人裁定为准。
+- 规则助手只依据本站资料和联网查到的来源作答，联网回答标明「本站未核对」并列出处；官方交给说书人的地方以说书人裁定为准。
 
 ## 技术实现
 
@@ -193,7 +195,9 @@ node tests/test_leak.mjs http://localhost:8851/                            # 三
 node tests/test_game.mjs http://localhost:8851/ ./shots                    # 两台手机打完一局 7 人暗流涌动
 node tests/test_review.mjs http://localhost:8851/ ./shots                  # 结算页评价卡（拦截总入口接口，不写线上数据）
 node tests/test_chat.mjs http://localhost:8851/ ./shots --mock-upstream    # 规则助手（wrangler dev 需加 --test-scheduled --var DEEPSEEK_API_KEY:fake --var DEEPSEEK_BASE:http://127.0.0.1:8852 --var CHAT_CF_MODEL:@cf/none/missing）
-node tests/test_chat.mjs https://你的域名/ ./shots --live                   # 规则助手线上实问一次
+node tests/test_chat.mjs http://localhost:8851/ ./shots --mock-web         # 联网查找（同样的 wrangler dev 参数；和 --mock-upstream 间隔 1 分钟以上，避开每分钟 8 问的限流）
+node tests/test_chat.mjs https://你的域名/ ./shots --live                   # 规则助手线上实问一次（本站资料能答的）
+node tests/test_chat.mjs https://你的域名/ ./shots --live-web               # 线上实问一题要联网的
 ```
 
 ## 部署

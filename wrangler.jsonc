@@ -9,7 +9,7 @@
   "rules": [{ "type": "Text", "globs": ["**/*.md"], "fallthrough": true }],
   "ratelimits": [{ "name": "CHAT_LIMIT", "namespace_id": "1061", "simple": { "limit": 8, "period": 60 } }],
   "ai": { "binding": "AI" },
-  "kv_namespaces": [{ "binding": "CHAT_STATE" }],
+  "kv_namespaces": [{ "binding": "CHAT_STATE", "id": "75c051f5e32b40e1a6de32667037b549" }],
   "triggers": { "crons": ["0 * * * *"] },
   "durable_objects": {
     "bindings": [{ "name": "ROOM", "class_name": "Room" }]
