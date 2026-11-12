@@ -15,8 +15,8 @@ try {
   page.on('pageerror', e => errors.push(e.message));
   async function layout(label) {
     await page.evaluate(() => document.fonts.ready);
-    assert.ok(await page.locator('.back-pill').isVisible(), label);
-    const issues = await page.locator('.back-pill').evaluate(el => {
+    assert.ok(await page.locator('.back-pill:not(.rate-nav)').isVisible(), label);
+    const issues = await page.locator('.back-pill:not(.rate-nav)').evaluate(el => {
       const a = el.getBoundingClientRect(), problems = [];
       if (a.height < 36 || a.left < 0 || a.right > innerWidth || a.top < 0 || a.bottom > innerHeight) problems.push('bounds');
       if (document.documentElement.scrollWidth > innerWidth) problems.push('overflow');
@@ -31,8 +31,8 @@ try {
     console.log('PASS', label, 'visible, 36px target, no overlap/overflow');
   }
   await page.goto(base);
-  assert.equal(await page.locator('.back-pill').textContent(), '‹ 全部游戏');
-  assert.equal(await page.locator('.back-pill').getAttribute('href'), 'https://boardgame.leisurecat.cloud');
+  assert.equal(await page.locator('.back-pill:not(.rate-nav)').textContent(), '‹ 全部游戏');
+  assert.equal(await page.locator('.back-pill:not(.rate-nav)').getAttribute('href'), 'https://boardgame.leisurecat.cloud');
   await layout('landing');
   await page.screenshot({ path: `${out}/nav_botc_landing.png` });
   await page.click('[data-act="create"]');
@@ -42,7 +42,7 @@ try {
   await page.waitForSelector('.cts');
   await layout('setup');
   await page.screenshot({ path: `${out}/nav_botc_room.png` });
-  await page.locator('.back-pill').click();
+  await page.locator('.back-pill:not(.rate-nav)').click();
   await page.waitForSelector('[data-act="create"]');
   await page.click(`[data-act="rejoin"][data-code="${code}"]`);
   await page.waitForSelector('[data-ed="tb"].on');
@@ -72,10 +72,10 @@ try {
     for (const publicView of [false, true]) {
       await page.goto(new URL(`/?r=${code}${publicView ? '&v=1' : ''}`, base).href);
       await page.waitForSelector('.who-tag');
-      assert.equal(await page.locator('.back-pill').textContent(), '‹ 首页');
+      assert.equal(await page.locator('.back-pill:not(.rate-nav)').textContent(), '‹ 首页');
       await layout(`${stage} ${publicView ? 'public' : 'storyteller'}`);
       assert.equal(await page.locator('#shot .back-pill').count(), 0);
-      await page.locator('.back-pill').click();
+      await page.locator('.back-pill:not(.rate-nav)').click();
       await page.waitForSelector('[data-act="create"]');
       await page.fill('#joinCode', code);
       await page.click('[data-act="join"]');
@@ -88,11 +88,11 @@ try {
   }
   for (const name of ['guide', 'roles', 'history']) {
     await page.goto(new URL(`/${name}.html`, base).href);
-    assert.equal(await page.locator('.back-pill').textContent(), '‹ 返回');
-    assert.equal(await page.locator('.back-pill').getAttribute('href'), '/');
+    assert.equal(await page.locator('.back-pill:not(.rate-nav)').textContent(), '‹ 返回');
+    assert.equal(await page.locator('.back-pill:not(.rate-nav)').getAttribute('href'), '/');
     await layout(name);
     if (name === 'guide') await page.screenshot({ path: `${out}/nav_botc_guide.png` });
-    await page.locator('.back-pill').click();
+    await page.locator('.back-pill:not(.rate-nav)').click();
     await page.waitForSelector('[data-act="create"]');
   }
   assert.deepEqual(errors, []);
