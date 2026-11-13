@@ -93,6 +93,16 @@
 - 每局自动存档，首页「往期对局」能查到。
 - 页面上有评价卡，可以给这款游戏打分。
 
+### 4 分钟讲规则（`/teach`）
+
+首页「第一次玩？4 分钟讲规则」进入，给说书人带一桌新人开局用，做法和匹兹堡、奥丁的讲规则页相同。
+
+- **讲稿**：6 段、约 920 字，正常语速约 4 分钟。依次讲怎么赢、角色和角色表、夜晚、白天和提名、处决和死亡、信息不一定是真的。每个重要要素用一句话点到（阵营、四类角色、魔典、角色标记、伪装、提名、投票、处决、生命标记和投票标记、醉酒和中毒）。具体角色能力不讲，让各自看角色标记和角色表。每段末尾有 2～3 个「桌上常见疑问」，点了直接问规则助手。
+- **术语**：带下划线的词点开，看图片、在哪儿看到、什么意思，还能一键问规则助手。
+- **注意事项**：19 条新人最容易弄错的点，比如能不能说谎、说书人给的信息可能是假的、醉酒和中毒、死人只剩一票、票从谁开始数、处决门槛和平票、处决不等于死亡、5～6 人局坏人不互认、红唇女郎、疯狂、旅行者和传奇角色。每条都写好了答案，默认收起，依据本站常见问题和官方 Wiki。
+- **图片**：只用 TPI 向社区工具开放的官方素材（`botc-release/resources`）：四类角色、旅行者、传奇角色的通用图标，善良和邪恶标记，三个剧本的标志，以及本站已有的角色图标，放在 `public/img/teach/` 和 `public/img/roles/`。魔典、提名、生命标记、投票标记这些没有官方开放的图，只放文字，不自己画。页脚署名并挂"Community Created Content"标识。
+- **只讲通用规则**：这一页不连房间，不会出现任何对局信息，测试会确认没有打开房间连接。
+
 ### 规则介绍、角色表、规则助手
 
 - **规则介绍**：16 节规则讲解和 40 条常见问题，每条标了出处（集石钟楼百科或官方 Wiki）。
@@ -163,6 +173,7 @@
 | `public/history.html`、`history.js` | 往期对局 |
 | `public/chat.js` | 规则助手悬浮窗 |
 | `public/guide.html` | 规则介绍（由 `tools/build_guide.py` 生成） |
+| `public/teach.html`、`teach.js` | 4 分钟讲规则：讲稿、术语、注意事项、图片速查的数据都在 `teach.js` 开头 |
 | `public/vendor/` | [html2canvas](https://github.com/niklasvh/html2canvas) 1.4.1（MIT，复盘长图）、[qrcode-generator](https://github.com/kazuhikoarase/qrcode-generator) 1.4.4（MIT，邀请二维码） |
 | `src/worker.js` | Cloudflare Worker：建房接口；`Room`（每个房间一个 Durable Object，WebSocket 同步，按连接分发说书人状态 / 公开视图 / 玩家自己的笔记，保存撤销栈和往期对局）；`/api/chat` 规则助手；每小时 cron |
 | `tools/` | 角色数据和生成脚本、规则讲解稿、常见问题、教程页生成脚本 |
@@ -194,6 +205,7 @@ node tests/test_logic.mjs                                                  # 数
 node tests/test_leak.mjs http://localhost:8851/                            # 三个剧本各 3 局：玩家收不到任何隐藏信息
 node tests/test_game.mjs http://localhost:8851/ ./shots                    # 两台手机打完一局 7 人暗流涌动
 node tests/test_review.mjs http://localhost:8851/ ./shots                  # 结算页评价卡（拦截总入口接口，不写线上数据）
+node tests/test_teach.mjs http://localhost:8851/ ./shots                   # 讲规则页（模拟 /api/chat，不调真模型；也可以对线上跑）
 node tests/test_chat.mjs http://localhost:8851/ ./shots --mock-upstream    # 规则助手（wrangler dev 需加 --test-scheduled --var DEEPSEEK_API_KEY:fake --var DEEPSEEK_BASE:http://127.0.0.1:8852 --var CHAT_CF_MODEL:@cf/none/missing）
 node tests/test_chat.mjs http://localhost:8851/ ./shots --mock-web         # 联网查找（同样的 wrangler dev 参数；和 --mock-upstream 间隔 1 分钟以上，避开每分钟 8 问的限流）
 node tests/test_chat.mjs https://你的域名/ ./shots --live                   # 规则助手线上实问一次（本站资料能答的）

@@ -33,6 +33,8 @@ $c('.cx').onclick = () => open(false);
 form.onsubmit = e => { e.preventDefault(); ask(box.value); };
 box.onkeydown = e => { if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); ask(box.value); } };
 log.onclick = e => { const b = e.target.closest('.csug button'); if (b) ask(b.textContent); };
+// Other pages (the teach page) open the panel and ask a question in one tap.
+window.askRules = q => { open(true); ask(q); };
 
 // Redraw the panel.
 function paint() {
